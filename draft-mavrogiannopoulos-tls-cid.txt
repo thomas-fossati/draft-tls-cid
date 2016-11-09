@@ -1,0 +1,224 @@
+
+
+
+
+TLS Working Group                                   N. Mavrogiannopoulos
+Internet-Draft                                                    RedHat
+Intended status: Standards Track                           H. Tschofenig
+Expires: May 13, 2017                                                ARM
+                                                              T. Fossati
+                                                                   Nokia
+                                                       November 09, 2016
+
+
+       Transport Agnostic Security Association Extension for TLS
+                 draft-mavrogiannopoulos-tls-cid-latest
+
+Abstract
+
+   TODO
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on May 13, 2017.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 13, 2017                  [Page 1]
+
+Internet-Draft              TLS CID Extension              November 2016
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Conventions used in this document . . . . . . . . . . . . . .   2
+   3.  A Section . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   2
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+   6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   3
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   3
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .   3
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   3
+
+1.  Introduction
+
+   In DTLS, the security context demultiplexing is done via the 5-tuple.
+   This implies that the associated DTLS context needs to be re-
+   negotiated from scratch whenever the transport identifiers change.
+   For example, when moving the network attachment from WLAN to a
+   cellular connection, or when the IP address of the IoT devices
+   changes during a sleep cycle.  A NAT device may also modify the
+   source UDP port after an idle period.  In such situations, there is
+   not enough information in the DTLS record header for a DTLS server,
+   which handles multiple clients, to associate the new address to an
+   existing client.
+
+   This memo proposes a new TLS extension [RFC6066] that allows a
+   transport independent identifier to be associated to a given DTLS
+   session.
+
+2.  Conventions used in this document
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   [RFC2119].
+
+3.  A Section
+
+     A picture
+
+                               Figure 1: xxx
+
+4.  Security Considerations
+
+   TODO
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 13, 2017                  [Page 2]
+
+Internet-Draft              TLS CID Extension              November 2016
+
+
+5.  IANA Considerations
+
+   TODO
+
+6.  Acknowledgments
+
+   TODO
+
+7.  References
+
+7.1.  Normative References
+
+   [I-D.ietf-tls-tls13]
+              Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", draft-ietf-tls-tls13-18 (work in progress),
+              October 2016.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+              (TLS) Protocol Version 1.2", RFC 5246,
+              DOI 10.17487/RFC5246, August 2008,
+              <http://www.rfc-editor.org/info/rfc5246>.
+
+   [RFC6066]  Eastlake 3rd, D., "Transport Layer Security (TLS)
+              Extensions: Extension Definitions", RFC 6066,
+              DOI 10.17487/RFC6066, January 2011,
+              <http://www.rfc-editor.org/info/rfc6066>.
+
+   [RFC6347]  Rescorla, E. and N. Modadugu, "Datagram Transport Layer
+              Security Version 1.2", RFC 6347, DOI 10.17487/RFC6347,
+              January 2012, <http://www.rfc-editor.org/info/rfc6347>.
+
+7.2.  Informative References
+
+   [I-D.barrett-mobile-dtls]
+              Williams, M. and J. Barrett, "Mobile DTLS", draft-barrett-
+              mobile-dtls-00 (work in progress), March 2009.
+
+Authors' Addresses
+
+   Nikos Mavrogiannopoulos
+   RedHat
+
+   EMail: nmav@redhat.com
+
+
+
+Mavrogiannopoulos, et al. Expires May 13, 2017                  [Page 3]
+
+Internet-Draft              TLS CID Extension              November 2016
+
+
+   Hannes Tschofenig
+   ARM
+
+   EMail: hannes.tschofenig@arm.com
+
+
+   Thomas Fossati
+   Nokia
+
+   EMail: thomas.fossati@nokia.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 13, 2017                  [Page 4]
