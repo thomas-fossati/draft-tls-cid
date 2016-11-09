@@ -369,7 +369,7 @@ li, p {
   </ul>
 
   <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a></h1>
-<p id="rfc.section.1.p.1">In DTLS, the security context demultiplexing is done via the 5-tuple. This implies that the associated DTLS context needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after an idle period.  In such situations, there is not enough information in the DTLS record header for a DTLS server, which handles multiple clients, to associate the new address to an existing client.</p>
+<p id="rfc.section.1.p.1">In DTLS, security context demultiplexing is done via the 5-tuple. This implies that the associated DTLS context needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after an idle period.  In such situations, there is not enough information in the DTLS record header for a DTLS server, which handles multiple clients, to associate the new address to an existing client.</p>
 <p id="rfc.section.1.p.2">This memo proposes a new TLS extension <a href="#RFC6066">[RFC6066]</a> that allows a transport independent identifier to be associated to a given DTLS session.</p>
 <h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#conventions-used-in-this-document" id="conventions-used-in-this-document">Conventions used in this document</a></h1>
 <p id="rfc.section.2.p.1">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in <a href="#RFC2119">[RFC2119]</a>.</p>
@@ -395,6 +395,12 @@ li, p {
         <b id="I-D.ietf-tls-tls13">[I-D.ietf-tls-tls13]</b>
       </td>
       <td class="top"><a>Rescorla, E.</a>, "<a href="http://tools.ietf.org/html/draft-ietf-tls-tls13-18">The Transport Layer Security (TLS) Protocol Version 1.3</a>", Internet-Draft draft-ietf-tls-tls13-18, October 2016.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.rescorla-tls-dtls13">[I-D.rescorla-tls-dtls13]</b>
+      </td>
+      <td class="top"><a>Rescorla, E.</a> and <a>H. Tschofenig</a>, "<a href="http://tools.ietf.org/html/draft-rescorla-tls-dtls13-00">The Datagram Transport Layer Security (DTLS) Protocol Version 1.3</a>", Internet-Draft draft-rescorla-tls-dtls13-00, October 2016.</td>
     </tr>
     <tr>
       <td class="reference">
