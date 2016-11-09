@@ -45,7 +45,7 @@ normative:
   RFC5246:
   RFC6347:
   I-D.ietf-tls-tls13:
-  draft-rescorla-tls-dtls13:
+  I-D.rescorla-tls-dtls13:
   RFC6066:
 
 informative:
