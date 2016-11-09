@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
+<!ENTITY RFC6347 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6347.xml">
+<!ENTITY RFC6066 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6066.xml">
+<!ENTITY I-D.ietf-dice-profile SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-dice-profile.xml">
+<!ENTITY I-D.barrett-mobile-dtls SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.barrett-mobile-dtls.xml">
+<!ENTITY I-D.ietf-tls-tls13 SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.ietf-tls-tls13.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<?rfc strict="yes" ?>
+<?rfc toc="yes"?>
+<?rfc tocdepth="4"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes" ?>
+<?rfc compact="yes" ?>
+<?rfc subcompact="no" ?>
+<?rfc comments="yes" ?>
+<?rfc inline="yes" ?>
+<rfc category="std" docName="draft-mavrogiannopoulos-tls-cid-latest" ipr="trust200902" updates="6066">
+  <front>
+    <title abbrev="TLS CID Extension">Transport Agnostic Security Association Extension for TLS</title>
+    <author fullname="Thomas Fossati" initials="T.F." surname="Fossati">
+      <organization>Nokia</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Cambridge</city>
+          <country>UK</country>
+        </postal>
+        <email>thomas.fossati@nokia.com</email>
+      </address>
+    </author>
+    <author fullname="Hannes Tschofenig" initials="H.T." surname="Tschofenig">
+      <organization>ARM</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Cambridge</city>
+          <country>UK</country>
+        </postal>
+        <email>hannes.tschofenig@arm.com</email>
+      </address>
+    </author>
+    <author fullname="Nikos Mavrogiannopoulos" initials="N.M." surname="Mavrogiannopoulos">
+      <organization>Red Hat</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Brno</city>
+          <country>Czech Republic</country>
+        </postal>
+        <email>nmav@redhat.com</email>
+      </address>
+    </author>
+    <date year="2016"/>
+    <area>General</area>
+    <workgroup>Internet Engineering Task Force</workgroup>
+    <keyword>DTLS, TLS, Internet of Things, IoT, TLS extensions</keyword>
+    <abstract>
+      <t>TODO</t>
+    </abstract>
+  </front>
+  <middle>
+    <section title="Introduction">
+      <t>Transport Agnostic Security Associations:"> Changes to a connection (such as an IP address change) requires a new handshake. This extension introduces a transport independent identifier.</t> 
+    </section> 
+
+
+    <section title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119">RFC 2119</xref>.</t>
+    </section>
+
+    <?rfc needLines="8" ?>
+    <section title="Transport Agnostic Security Associations" anchor="sec:ta-sa">
+      <section title="Problem Statement">
+        <t>In DTLS, the security context demultiplexing is done via the 5-tuple. This implies that the associated DTLS context needs to be re-negotiated from scratch whenever the IP address changes. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cyle. A NAT device may also modify the source UDP port after an idle period.  In such situations, there is not enough information in the DTLS record header for a DTLS server, which handles multiple clients, to associate the changed address to an existing client.</t>
+      </section>
+      <section title="Proposal">
+        <t>A potential solution is to add the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier the 'Connection ID (CID)' in <xref target="fig:scid"/>. It decouples the DTLS session from the underlying transport protocol allowing the same DTLS security association to be migrated across different transport sessions.</t>
+        <figure title="Transparent Handover of DTLS Session" anchor="fig:scid">
+          <artwork>
+            <![CDATA[
+                                     00
+                                     /\
+                                     :
+ IP                    UDP           : DTLS Record Header
+ +-----+-----+-------+ +-----+-----+ : +---------+-------+------
+ | src | dst | proto | | src | dst | : | Seq#i   |  CID  | ...
+ +-----+-----+-------+ +-----+-----+ : +---------+-------+------
+ `----------------+----------------' :              ^
+                   `................ : .............'
+  <Handover event>                   :
+                   GSM-SMS           : DTLS Record Header
+                   +-------+-------+ : +---------+-------+-----
+                   | tp-oa | tp-da | : | Seq#i+1 |  CID  | ...
+                   +-------+-------+ : +---------+-------+-----
+                                     :
+                                     \/
+                                     00
+            ]]>
+          </artwork>
+        </figure>
+        <t>That approach modifies the DTLS record layer header to the format described in <xref target="fig:record-format"/>.</t>
+                <figure title="Modified DTLS Record Format" anchor="fig:record-format">
+          <artwork>
+            <![CDATA[
+      struct {
+           ContentType type;
+           ProtocolVersion version;
+           uint16 epoch;
+           uint48 sequence_number;
+           uint32 connection_id;                          // New field
+           uint16 length;
+           opaque fragment[DTLSPlaintext.length];
+      } DTLSPlaintext;
+            ]]>
+          </artwork>
+        </figure>
+        <t>A similar approach to support transparent handover of a DTLS session has been described in <xref target="I-D.barrett-mobile-dtls"/> and <xref target="Seggelmann"/>.</t>
+        <t>The privacy issue associated with the use of a long-term identifier must be taken into consideration.  For example, client and server could use a hash chain <xref target="Lamport"/> derived from the shared secret and pick the next unused id on handover.</t>
+      </section>
+    </section>
+    <section title="Reducing the DTLS Record Layer Header Overhead" anchor="sec:diet">
+      <section title="Problem Statement">
+        <t>The DTLS record layer header adds 13 bytes of overhead, as described in Appendix B of <xref target="I-D.ietf-dice-profile"/>. While some of the information carried in the header is unavoidable, other parameters are redundant and included for backwards compatibility reasons. This burden becomes quite substantial in networks with small frame sizes (e.g., low power wide area networks).</t>
+        <t>Overhead that is not strictly needed could be removed to allow applications to transmit more data in a single packet or to make space for other DTLS features, such as the proposal described in <xref target="sec:ta-sa"/>.</t>
+      </section>
+      <section title="Proposal">
+        <t>It is possible to at least remove the following parameters in the header: 
+          <list style="symbols">
+            <t>Protocol Version (2 bytes)</t>
+            <t>The sequence number component of the nonce_explicit field at the AES-CCM layer is an exact copy of the sequence number in the record layer header field. This leads to a duplication of 8-bytes per record.</t>
+          </list>
+        </t>
+      </section>
+    </section>
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>We would like to thank Stephen Farrell for suggesting the use of hash chains to implement a privacy-friendly connection id.</t>
+    </section>
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This memo is likely to include a bunch of requests to IANA.</t>
+    </section>
+    <section anchor="Security" title="Security Considerations">
+      <t>TODO</t>
+    </section>
+  </middle>
+  <back>
+    <references title="Normative References">
+     &RFC2119;
+     &RFC6347;
+     &RFC6066;
+     &I-D.ietf-tls-tls13;
+    </references>
+    <references title="Informative References">
+     &I-D.ietf-dice-profile;
+     &I-D.barrett-mobile-dtls;
+
+     <reference anchor="Seggelmann">
+      <front>
+        <title>DTLS Mobility</title>
+        <author initials="R.S." surname="Seggelmann">
+          <organization/>
+        </author>
+        <author initials="M.T." surname="Tuexen">
+          <organization/>
+        </author>
+        <author initials="E.R." surname="Rathgeb">
+          <organization/>
+        </author>
+        <date year="2012"/>
+      </front>
+      <seriesInfo name="ICDCN" value="12" />
+    </reference>
+
+   </references>
+    <!-- Change Log
+v00 2016-11-09  TF   Initial version (fork from draft-fossati-tls-iot-optimizations)
+    -->
+  </back>
+</rfc>
+
+<!-- vim: set tabstop=2 shiftwidth=2 expandtab smarttab : -->
