@@ -59,7 +59,9 @@ TODO
 
 # Introduction
 
-TODO
+In DTLS, the security context demultiplexing is done via the 5-tuple. This implies that the associated DTLS context needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after an idle period.  In such situations, there is not enough information in the DTLS record header for a DTLS server, which handles multiple clients, to associate the new address to an existing client.
+
+This memo proposes a new TLS extension {{RFC6066}} that allows a transport independent identifier to be associated to a given DTLS session.
 
 # Conventions used in this document
 
