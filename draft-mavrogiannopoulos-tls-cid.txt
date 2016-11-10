@@ -69,7 +69,7 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Conventions used in this document . . . . . . . . . . . . . .   3
-   3.  Trasport Agnostic Security Associatiation Extension . . . . .   3
+   3.  Transport Agnostic Security Associatiation Extension  . . . .   3
      3.1.  Extended Client Hello . . . . . . . . . . . . . . . . . .   4
      3.2.  Extended Server Hello . . . . . . . . . . . . . . . . . .   5
    4.  HOTP-generated CID Clash  . . . . . . . . . . . . . . . . . .   5
@@ -144,7 +144,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    "OPTIONAL" in this document are to be interpreted as described in
    [RFC2119].
 
-3.  Trasport Agnostic Security Associatiation Extension
+3.  Transport Agnostic Security Associatiation Extension
 
    In order to negotiate a Transport Agnostic Security Association,
    clients include an extension of type "ta_sa" in the (extended) client
@@ -198,8 +198,8 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    In the case of the fixed(0) type, the cid of the packets after
    ChangeCipherSpec is sent explicitly by the server.
 
-   In the case of hotp(1) option the initial 'cid' is is calculated
-   using the HOTP algorithm ([RFC4226]) as follows:
+   In the case of hotp(1) option the initial 'cid' is calculated using
+   the HOTP algorithm ([RFC4226]) as follows:
 
    o  A 20-byte string is generated [RFC5705] exporter.  The key
       material exporter uses the label "EXPORTER-ta-security-
