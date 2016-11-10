@@ -179,6 +179,10 @@ Servers that receive an extended hello containing a "ta_sa" extension MAY agree 
 
 In the case of the fixed(0) type, the cid_value contains the value to be used as 'cid'.  In the case of hotp(1), the window_size must be greater or equal to 1, and indicates the number of HOTP values that the server can recognize for this particular client.
 
+# HOTP-generated CID Clash
+
+TODO
+
 # Security Considerations
 
 TODO
