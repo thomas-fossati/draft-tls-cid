@@ -273,12 +273,13 @@ li, p {
 <link href="#rfc.section.3" rel="Chapter" title="3 Trasport Agnostic Security Associatiation Extension"/>
 <link href="#rfc.section.3.1" rel="Chapter" title="3.1 Extended Client Hello"/>
 <link href="#rfc.section.3.2" rel="Chapter" title="3.2 Extended Server Hello"/>
-<link href="#rfc.section.4" rel="Chapter" title="4 Security Considerations"/>
-<link href="#rfc.section.5" rel="Chapter" title="5 IANA Considerations"/>
-<link href="#rfc.section.6" rel="Chapter" title="6 Acknowledgments"/>
-<link href="#rfc.references" rel="Chapter" title="7 References"/>
-<link href="#rfc.references.1" rel="Chapter" title="7.1 Normative References"/>
-<link href="#rfc.references.2" rel="Chapter" title="7.2 Informative References"/>
+<link href="#rfc.section.4" rel="Chapter" title="4 HOTP-generated CID Clash"/>
+<link href="#rfc.section.5" rel="Chapter" title="5 Security Considerations"/>
+<link href="#rfc.section.6" rel="Chapter" title="6 IANA Considerations"/>
+<link href="#rfc.section.7" rel="Chapter" title="7 Acknowledgments"/>
+<link href="#rfc.references" rel="Chapter" title="8 References"/>
+<link href="#rfc.references.1" rel="Chapter" title="8.1 Normative References"/>
+<link href="#rfc.references.2" rel="Chapter" title="8.2 Informative References"/>
 <link href="#rfc.authors" rel="Chapter"/>
 
 
@@ -361,12 +362,13 @@ li, p {
 <li>3.   <a href="#rfc.section.3">Trasport Agnostic Security Associatiation Extension</a></li>
 <ul><li>3.1.   <a href="#rfc.section.3.1">Extended Client Hello</a></li>
 <li>3.2.   <a href="#rfc.section.3.2">Extended Server Hello</a></li>
-</ul><li>4.   <a href="#rfc.section.4">Security Considerations</a></li>
-<li>5.   <a href="#rfc.section.5">IANA Considerations</a></li>
-<li>6.   <a href="#rfc.section.6">Acknowledgments</a></li>
-<li>7.   <a href="#rfc.references">References</a></li>
-<ul><li>7.1.   <a href="#rfc.references.1">Normative References</a></li>
-<li>7.2.   <a href="#rfc.references.2">Informative References</a></li>
+</ul><li>4.   <a href="#rfc.section.4">HOTP-generated CID Clash</a></li>
+<li>5.   <a href="#rfc.section.5">Security Considerations</a></li>
+<li>6.   <a href="#rfc.section.6">IANA Considerations</a></li>
+<li>7.   <a href="#rfc.section.7">Acknowledgments</a></li>
+<li>8.   <a href="#rfc.references">References</a></li>
+<ul><li>8.1.   <a href="#rfc.references.1">Normative References</a></li>
+<li>8.2.   <a href="#rfc.references.2">Informative References</a></li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a></li>
 
 
@@ -465,15 +467,17 @@ li, p {
 </pre>
 <p class="figure">Figure 4: ta_sa extension, server</p>
 <p id="rfc.section.3.2.p.2">In the case of the fixed(0) type, the cid_value contains the value to be used as &#8216;cid&#8217;.  In the case of hotp(1), the window_size must be greater or equal to 1, and indicates the number of HOTP values that the server can recognize for this particular client.</p>
-<h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a></h1>
+<h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#hotp-generated-cid-clash" id="hotp-generated-cid-clash">HOTP-generated CID Clash</a></h1>
 <p id="rfc.section.4.p.1">TODO</p>
-<h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a></h1>
-<p id="rfc.section.5.p.1">This document defines a TLS extension: ts_sa(TODO).  This extension is assigned from the TLS ExtensionType registry defined in <a href="#RFC5246">[RFC5246]</a>.</p>
-<h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#acknowledgments" id="acknowledgments">Acknowledgments</a></h1>
-<p id="rfc.section.6.p.1">Thanks to Achim Krauss, Carsten Bormann, Kai Hudalla, Simon Bernard, Stephen Farrell, for helpful comments and discussions that have shaped the document.</p>
-<p id="rfc.section.6.p.2">This work is partially supported by the European Commission under Horizon 2020 grant agreement no. 688421 Measurement and Architecture for a Middleboxed Internet (MAMI). This support does not imply endorsement.</p>
-<h1 id="rfc.references"><a href="#rfc.references">7.</a> References</h1>
-<h1 id="rfc.references.1"><a href="#rfc.references.1">7.1.</a> Normative References</h1>
+<h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a></h1>
+<p id="rfc.section.5.p.1">TODO</p>
+<h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a></h1>
+<p id="rfc.section.6.p.1">This document defines a TLS extension: ts_sa(TODO).  This extension is assigned from the TLS ExtensionType registry defined in <a href="#RFC5246">[RFC5246]</a>.</p>
+<h1 id="rfc.section.7"><a href="#rfc.section.7">7.</a> <a href="#acknowledgments" id="acknowledgments">Acknowledgments</a></h1>
+<p id="rfc.section.7.p.1">Thanks to Achim Krauss, Carsten Bormann, Kai Hudalla, Simon Bernard, Stephen Farrell, for helpful comments and discussions that have shaped the document.</p>
+<p id="rfc.section.7.p.2">This work is partially supported by the European Commission under Horizon 2020 grant agreement no. 688421 Measurement and Architecture for a Middleboxed Internet (MAMI). This support does not imply endorsement.</p>
+<h1 id="rfc.references"><a href="#rfc.references">8.</a> References</h1>
+<h1 id="rfc.references.1"><a href="#rfc.references.1">8.1.</a> Normative References</h1>
 <table>
   <tbody>
     <tr>
@@ -526,7 +530,7 @@ li, p {
     </tr>
   </tbody>
 </table>
-<h1 id="rfc.references.2"><a href="#rfc.references.2">7.2.</a> Informative References</h1>
+<h1 id="rfc.references.2"><a href="#rfc.references.2">8.2.</a> Informative References</h1>
 <table>
   <tbody>
     <tr>

@@ -72,12 +72,13 @@ Table of Contents
    3.  Trasport Agnostic Security Associatiation Extension . . . . .   3
      3.1.  Extended Client Hello . . . . . . . . . . . . . . . . . .   4
      3.2.  Extended Server Hello . . . . . . . . . . . . . . . . . .   5
-   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
-   6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+   4.  HOTP-generated CID Clash  . . . . . . . . . . . . . . . . . .   5
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .   7
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   7
 
 1.  Introduction
@@ -100,7 +101,6 @@ Table of Contents
    allowing the same DTLS security association to be migrated across
    different sessions of the same transport, or even to a completely
    different transport as showed in Figure 1.
-
 
 
 
@@ -264,14 +264,14 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    greater or equal to 1, and indicates the number of HOTP values that
    the server can recognize for this particular client.
 
-4.  Security Considerations
+4.  HOTP-generated CID Clash
 
    TODO
 
-5.  IANA Considerations
+5.  Security Considerations
 
-   This document defines a TLS extension: ts_sa(TODO).  This extension
-   is assigned from the TLS ExtensionType registry defined in [RFC5246].
+   TODO
+
 
 
 
@@ -282,7 +282,12 @@ Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 5]
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
-6.  Acknowledgments
+6.  IANA Considerations
+
+   This document defines a TLS extension: ts_sa(TODO).  This extension
+   is assigned from the TLS ExtensionType registry defined in [RFC5246].
+
+7.  Acknowledgments
 
    Thanks to Achim Krauss, Carsten Bormann, Kai Hudalla, Simon Bernard,
    Stephen Farrell, for helpful comments and discussions that have
@@ -293,9 +298,9 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    for a Middleboxed Internet (MAMI).  This support does not imply
    endorsement.
 
-7.  References
+8.  References
 
-7.1.  Normative References
+8.1.  Normative References
 
    [I-D.ietf-tls-tls13]
               Rescorla, E., "The Transport Layer Security (TLS) Protocol
@@ -326,11 +331,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               Layer Security (TLS)", RFC 5705, DOI 10.17487/RFC5705,
               March 2010, <http://www.rfc-editor.org/info/rfc5705>.
 
-   [RFC6066]  Eastlake 3rd, D., "Transport Layer Security (TLS)
-              Extensions: Extension Definitions", RFC 6066,
-              DOI 10.17487/RFC6066, January 2011,
-              <http://www.rfc-editor.org/info/rfc6066>.
-
 
 
 Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 6]
@@ -338,11 +338,16 @@ Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 6]
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
+   [RFC6066]  Eastlake 3rd, D., "Transport Layer Security (TLS)
+              Extensions: Extension Definitions", RFC 6066,
+              DOI 10.17487/RFC6066, January 2011,
+              <http://www.rfc-editor.org/info/rfc6066>.
+
    [RFC6347]  Rescorla, E. and N. Modadugu, "Datagram Transport Layer
               Security Version 1.2", RFC 6347, DOI 10.17487/RFC6347,
               January 2012, <http://www.rfc-editor.org/info/rfc6347>.
 
-7.2.  Informative References
+8.2.  Informative References
 
    [DTLSMOB]  Seggelmann, R., Tuexen, M., and E. Rathgeb, "DTLS
               Mobility", 2012.
@@ -369,11 +374,6 @@ Authors' Addresses
    Nokia
 
    EMail: thomas.fossati@nokia.com
-
-
-
-
-
 
 
 
