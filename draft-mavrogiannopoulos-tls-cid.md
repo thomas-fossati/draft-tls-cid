@@ -52,7 +52,7 @@ normative:
 
 informative:
   I-D.barrett-mobile-dtls:
-  RFC4303:
+  RFC4301:
   DTLSMOB:
     title: DTLS Mobility
     author:
@@ -67,7 +67,7 @@ informative:
 
 --- abstract
 
-This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different sessions of the same transport, or to a completely different transport.
+This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different instances of the same transport, or to a completely different transport.
 
 --- middle
 
@@ -75,7 +75,7 @@ This memo proposes a new Datagram Transport Transport Layer Security (DTLS) exte
 
 DTLS security context demultiplexing is done via the 5-tuple. Therefore, it needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after an short idle period.  In such situations, there is not enough information in the DTLS record header for a server that is handling multiple concurrent sessions to associate the new address to an existing client.
 
-This memo proposes a new TLS extension {{RFC6066}} that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier 'Connection ID (CID)'.  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different sessions of the same transport, or even to a completely different transport as showed in {{fig:transp-handover}}.
+This memo proposes a new TLS extension {{RFC6066}} that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier 'Connection ID (CID)'.  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different instances of the same transport, or even to a completely different transport as showed in {{fig:transp-handover}}.
 
 ~~~~~~~~~~
                                      00
@@ -98,20 +98,9 @@ This memo proposes a new TLS extension {{RFC6066}} that provides the ability to 
 ~~~~~~~~~~
 {: #fig:transp-handover title="Transparent Handover of DTLS Session"}
 
-We propose two methods to generate the CID, a fixed one, and a dynamic
-privacy-friendly one. On the fixed the server assigns statically the CID based on identifiers
-known to it and is fixed throughout the session. The latter allows for
-multiple identifiers for the client, and that allows for the client to
-change its identifier when switching networks. That, on certain scenarios
-(e.g., when the client is aware for the underlying transport change), to
-prevent the tracking for the client. On the other hand, the privacy friendly
-approach does not guarrantee unique identifiers for each client.
-
-For both methods, the generated CID is 32-bits, something that matches the size of the
-similar in functionality SPI field in the ESP protocol {{RFC4303}}.
+We present two methods for producing the CID: the first uses a single value generated unilaterally by the server which is fixed throughout the session, whereas the second provides a sequence of identifiers that are created using a HMAC-based OTP algorithm {{RFC4226}} keyed with the session shared secret. The latter allows a client to shift to a new identifier, for example when switching networks, and is intended as a measure to counteract tracking.  However, it must be noted that this is not a generally viable way to avoid being tracked: in fact, it becomes totally ineffective when the client is oblivious of changes in the underlying transport identifiers (e.g., on NAT rebind after timeout), and also does not guarantee unique identifiers (see {{sec:clash}}).  For both methods the generated CID is 32-bits in size, like the Security Parameter Index (SPI) in IPsec {{RFC4301}}.
 
 Similar approaches to support transparent handover of a DTLS session have been described in {{I-D.barrett-mobile-dtls}} and {{DTLSMOB}}.
-
 
 # Conventions used in this document
 
@@ -191,6 +180,21 @@ Servers that receive an extended hello containing a "ta_sa" extension MAY agree 
 {: #fig:srv-ext title="ta_sa extension, server"}
 
 In the case of the fixed(0) type, the cid_value contains the value to be used as 'cid'.  In the case of hotp(1), the window_size must be greater or equal to 1, and indicates the number of HOTP values that the server can recognize for this particular client.
+
+# Clashing HOTP CIDs
+{: #sec:clash }
+Under the assumption that HOTP behaves like a PRF, the following table encodes the probability of a (32-bit) HOTP CID clash event in relation to the number of sessions a server might be concurrently handling.
+
+| Sessions | Collision probability                        |
+|:---------|:---------------------------------------------|
+| 10       |  1.16415320717e-08, or about 1 in 85,899,347 |
+| 100      |  1.16415254059e-06, or about 1 in 858,994    |
+| 1000     |  0.000116408545826, or about 1 in 8,590      |
+| 10000    |  0.011574031737, or about 1 in 86            |
+| 100000   |  0.687813095694, or about 1 in 1             |
+| 1000000  |  1.0, or about 1 in 1                        |
+
+TODO
 
 # Security Considerations
 
