@@ -5,10 +5,10 @@
 TLS Working Group                                   N. Mavrogiannopoulos
 Internet-Draft                                                    RedHat
 Intended status: Standards Track                           H. Tschofenig
-Expires: May 14, 2017                                                ARM
+Expires: May 15, 2017                                                ARM
                                                               T. Fossati
                                                                    Nokia
-                                                       November 10, 2016
+                                                       November 11, 2016
 
 
  Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic
@@ -22,7 +22,7 @@ Abstract
    handshake, a transport independent identifier that is unique per
    security association.  This identifier effectively decouples the DTLS
    session from the underlying transport protocol, allowing the same
-   security association to be migrated across different sessions of the
+   security association to be migrated across different instances of the
    same transport, or to a completely different transport.
 
 Status of This Memo
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 14, 2017.
+   This Internet-Draft will expire on May 15, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 1]
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 1]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -69,17 +69,17 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Conventions used in this document . . . . . . . . . . . . . .   3
-   3.  Transport Agnostic Security Associatiation Extension  . . . .   3
+   3.  Transport Agnostic Security Associatiation Extension  . . . .   4
      3.1.  Extended Client Hello . . . . . . . . . . . . . . . . . .   4
      3.2.  Extended Server Hello . . . . . . . . . . . . . . . . . .   5
-   4.  HOTP-generated CID Clash  . . . . . . . . . . . . . . . . . .   5
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+   4.  Clashing HOTP CIDs  . . . . . . . . . . . . . . . . . . . . .   6
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
    7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
      8.2.  Informative References  . . . . . . . . . . . . . . . . .   7
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   7
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
 
 1.  Introduction
 
@@ -96,10 +96,10 @@ Table of Contents
    This memo proposes a new TLS extension [RFC6066] that provides the
    ability to negotiate, at handshake time, a transport independent
    identifier that is unique per security association.  We call this
-   identifier 'Connection ID (cid)'.  Its function is to effectively
+   identifier 'Connection ID (CID)'.  Its function is to effectively
    decouple the DTLS session from the underlying transport protocol,
    allowing the same DTLS security association to be migrated across
-   different sessions of the same transport, or even to a completely
+   different instances of the same transport, or even to a completely
    different transport as showed in Figure 1.
 
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 2]
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 2]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -134,8 +134,22 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
               Figure 1: Transparent Handover of DTLS Session
 
-   A similar approach to support transparent handover of a DTLS session
-   has been described in [I-D.barrett-mobile-dtls] and [DTLSMOB].
+   We present two methods for producing the CID: the first uses a single
+   value generated unilaterally by the server which is fixed throughout
+   the session, whereas the second provides a sequence of identifiers
+   that are created using a HMAC-based OTP algorithm [RFC4226] keyed
+   with the session shared secret.  The latter allows a client to shift
+   to a new identifier, for example when switching networks, and is
+   intended as a measure to counteract tracking.  However, it must be
+   noted that this is not a generally viable way to avoid being tracked:
+   in fact, it becomes totally ineffective when the client is oblivious
+   of changes in the underlying transport identifiers (e.g., on NAT
+   rebind after timeout), and also does not guarantee unique identifiers
+   (see Section 4).  For both methods the generated CID is 32-bits in
+   size, like the Security Parameter Index (SPI) in IPsec [RFC4301].
+
+   Similar approaches to support transparent handover of a DTLS session
+   have been described in [I-D.barrett-mobile-dtls] and [DTLSMOB].
 
 2.  Conventions used in this document
 
@@ -143,6 +157,18 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
    "OPTIONAL" in this document are to be interpreted as described in
    [RFC2119].
+
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 3]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
 3.  Transport Agnostic Security Associatiation Extension
 
@@ -162,14 +188,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    server.  However, only a client can initiate a switch to an unused
    'cid' value; a server MUST utilize the same value seen on the last
    valid message received by the client.  A server which receives a
-
-
-
-Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 3]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
-
    'cid' value which is not expected (e.g., a value outside its
    advertised window) MAY ignore the packet.
 
@@ -201,6 +219,13 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    In the case of hotp(1) option the initial 'cid' is calculated using
    the HOTP algorithm ([RFC4226]) as follows:
 
+
+
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 4]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
+
    o  A 20-byte string is generated [RFC5705] exporter.  The key
       material exporter uses the label "EXPORTER-ta-security-
       association-hotp" without the quotes, and without any context
@@ -212,19 +237,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    Subsequent values of the HOTP algorithm can be used in place of the
    initial, as long as they fall into the negotiated window_size (see
    Figure 4).
-
-
-
-
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 4]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
 
             enum {
                 fixed(0), hotp(1), (255)
@@ -261,26 +273,41 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
    In the case of the fixed(0) type, the cid_value contains the value to
    be used as 'cid'.  In the case of hotp(1), the window_size must be
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 5]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
+
    greater or equal to 1, and indicates the number of HOTP values that
    the server can recognize for this particular client.
 
-4.  HOTP-generated CID Clash
+4.  Clashing HOTP CIDs
+
+   Under the assumption that HOTP behaves like a PRF, the following
+   table encodes the probability of a (32-bit) HOTP CID clash event in
+   relation to the number of sessions a server might be concurrently
+   handling.
+
+        +----------+---------------------------------------------+
+        | Sessions | Collision probability                       |
+        +----------+---------------------------------------------+
+        | 10       | 1.16415320717e-08, or about 1 in 85,899,347 |
+        | 100      | 1.16415254059e-06, or about 1 in 858,994    |
+        | 1000     | 0.000116408545826, or about 1 in 8,590      |
+        | 10000    | 0.011574031737, or about 1 in 86            |
+        | 100000   | 0.687813095694, or about 1 in 1             |
+        | 1000000  | 1.0, or about 1 in 1                        |
+        +----------+---------------------------------------------+
 
    TODO
 
 5.  Security Considerations
 
    TODO
-
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 5]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
 
 6.  IANA Considerations
 
@@ -299,6 +326,17 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    endorsement.
 
 8.  References
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 6]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
 8.1.  Normative References
 
@@ -331,13 +369,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               Layer Security (TLS)", RFC 5705, DOI 10.17487/RFC5705,
               March 2010, <http://www.rfc-editor.org/info/rfc5705>.
 
-
-
-Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 6]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
-
    [RFC6066]  Eastlake 3rd, D., "Transport Layer Security (TLS)
               Extensions: Extension Definitions", RFC 6066,
               DOI 10.17487/RFC6066, January 2011,
@@ -355,6 +386,17 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    [I-D.barrett-mobile-dtls]
               Williams, M. and J. Barrett, "Mobile DTLS", draft-barrett-
               mobile-dtls-00 (work in progress), March 2009.
+
+
+
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 7]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
+
+   [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
+              Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
+              December 2005, <http://www.rfc-editor.org/info/rfc4301>.
 
 Authors' Addresses
 
@@ -389,4 +431,18 @@ Authors' Addresses
 
 
 
-Mavrogiannopoulos, et al. Expires May 14, 2017                  [Page 7]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 8]
