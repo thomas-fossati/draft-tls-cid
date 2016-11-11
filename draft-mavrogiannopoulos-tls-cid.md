@@ -73,9 +73,9 @@ This memo proposes a new Datagram Transport Transport Layer Security (DTLS) exte
 
 # Introduction
 
-DTLS security context demultiplexing is done via the 5-tuple. Therefore, it needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after an short idle period.  In such situations, there is not enough information in the DTLS record header for a server that is handling multiple concurrent sessions to associate the new address to an existing client.
+DTLS security context demultiplexing is done via the 5-tuple. Therefore, the security association needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after a short idle period.  In such situations, there is not enough information in the DTLS record header for a server that is handling multiple concurrent sessions to associate the new address to an existing client.
 
-This memo proposes a new TLS extension {{RFC6066}} that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier 'Connection ID (CID)'.  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different instances of the same transport, or even to a completely different transport as showed in {{fig:transp-handover}}.
+This memo proposes a new TLS extension {{RFC6066}} that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier 'Connection ID (CID)'.  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different instances of the same transport, or even to a completely different transport - e.g., from UDP to GSM-SMS as showed in {{fig:transp-handover}}.
 
 ~~~~~~~~~~
                                      00
@@ -98,7 +98,7 @@ This memo proposes a new TLS extension {{RFC6066}} that provides the ability to 
 ~~~~~~~~~~
 {: #fig:transp-handover title="Transparent Handover of DTLS Session"}
 
-We present two methods for producing the CID: the first uses a single value generated unilaterally by the server which is fixed throughout the session, whereas the second provides a sequence of identifiers that are created using a HMAC-based OTP algorithm {{RFC4226}} keyed with the session shared secret. The latter allows a client to shift to a new identifier, for example when switching networks, and is intended as a measure to counteract tracking.  However, it must be noted that this is not a generally viable way to avoid being tracked: in fact, it becomes totally ineffective when the client is oblivious of changes in the underlying transport identifiers (e.g., on NAT rebind after timeout), and also does not guarantee unique identifiers (see {{sec:clash}}).  For both methods the generated CID is 32-bits in size, like the Security Parameter Index (SPI) in IPsec {{RFC4301}}.
+We present two methods for producing the CID: the first uses a single value generated unilaterally by the server which is fixed throughout the session, whereas the second provides a sequence of identifiers that are created using a HMAC-based OTP algorithm {{RFC4226}} keyed with the session shared secret. The latter allows a client to shift to a new identifier, for example when switching networks, and is intended as a mechanism to counteract tracking.  However, it must be noted that this is not generally applicable as a tracking-protection measure: in fact, it becomes totally ineffective when the client is oblivious of changes in the underlying transport identifiers (e.g., on NAT rebind after timeout), and also does not guarantee unique identifiers (see {{sec:clash}} for further details).  Both methods generate a CID that is 32-bits in size, like the Security Parameter Index (SPI) in IPsec {{RFC4301}}.
 
 Similar approaches to support transparent handover of a DTLS session have been described in {{I-D.barrett-mobile-dtls}} and {{DTLSMOB}}.
 
@@ -108,9 +108,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 # Transport Agnostic Security Associatiation Extension
 
-In order to negotiate a Transport Agnostic Security Association, clients include an extension of type "ta_sa" in the (extended) client hello ({{sec:ext-cli}}).  Servers that receive an extended hello containing a "ta_sa" extension MAY agree to use a Transport Agnostic Security Association by including an extension of type "ta_sa" in the extended server hello ({{sec:srv-ext}}).
+In order to negotiate a Transport Agnostic Security Association, clients include an extension of type "ta_sa" in the extended client hello ({{sec:ext-cli}}).  Servers that receive an extended hello containing a "ta_sa" extension MAY agree to use a Transport Agnostic Security Association by including an extension of type "ta_sa" in the extended server hello ({{sec:srv-ext}}).
 
-In both server and client agree, the DTLSCiphertext format does change after the DTLS connection state is updated; i.e., for the sending side, after the ChangeCipherSpec message is sent.  For the receiving sides, after the ChangeCipherSpec is received.
+If both server and client agree, the DTLSCiphertext format does change after the DTLS connection state is updated; i.e.: for the sending side, after the ChangeCipherSpec message is sent, for the receiving sides, after the ChangeCipherSpec is received.
 
 The DTLSCiphertext format is changed for both the client and the server.  However, only a client can initiate a switch to an unused 'cid' value; a server MUST utilize the same value seen on the last valid message received by the client.  A server which receives a 'cid' value which is not expected (e.g., a value outside its advertised window) MAY ignore the packet.
 
@@ -135,14 +135,14 @@ The DTLSCiphertext format is changed for both the client and the server.  Howeve
 ## Extended Client Hello
 {: #sec:ext-cli }
 
-In order to negotiate a Transport Agnostic Security Association, clients include an extension of type "ta_sa" in the (extended) client hello.  The "extension_data" field of this extension SHALL contain the ClientSecAssocData structure in {{fig:cli-ext}}.
+In order to negotiate a Transport Agnostic Security Association, clients include an extension of type "ta_sa" in the extended client hello.  The "extension_data" field of this extension SHALL contain the ClientSecAssocData structure in {{fig:cli-ext}}.
 
- In the case of the fixed(0) type, the cid of the packets after ChangeCipherSpec is sent explicitly by the server.
+In case a fixed(0) type has been negotiated, the 'cid' of the packets after ChangeCipherSpec is sent explicitly by the server.
 
-In the case of hotp(1) option the initial 'cid' is calculated using the HOTP algorithm ({{RFC4226}}) as follows:
+In case a hotp(1) type has been negotiated, the initial 'cid' is calculated using the HOTP algorithm ({{RFC4226}}) as follows:
 
-- A 20-byte string is generated {{RFC5705}} exporter.  The key material exporter uses the label "EXPORTER-ta-security- association-hotp" without the quotes, and without any context value.
-- The initial 'cid' equals to the first HOTP value (i.e., the 31-bit value of Sbits in {{RFC4226}} notation), as generated by using the previously exported value as K.
+- A 20-byte string is generated using a {{RFC5705}} exporter.  The key material exporter uses the label "EXPORTER-ta-security-association-hotp" without the quotes, and without any context value.
+- The initial 'cid' equals to the first HOTP value (i.e., the 31-bit value of Sbits in {{RFC4226}} notation), generated by using the previously exported value as K.
 
 Subsequent values of the HOTP algorithm can be used in place of the initial, as long as they fall into the negotiated window_size (see {{fig:srv-ext}}).
 
@@ -160,7 +160,7 @@ Subsequent values of the HOTP algorithm can be used in place of the initial, as 
 ## Extended Server Hello
 {: #sec:srv-ext }
 
-Servers that receive an extended hello containing a "ta_sa" extension MAY agree to use a Transport Agnostic Security Association by including an extension of type "ta_sa", with "extension_data" being ServerSecAssocData, in the extended server hello ({{fig:srv-ext}}).
+Servers that receive an extended hello containing a "ta_sa" extension MAY agree to use a Transport Agnostic Security Association by including an extension of type "ta_sa", with "extension_data" being ServerSecAssocData in the extended server hello ({{fig:srv-ext}}).
 
 ~~~~~~~
          struct {
@@ -179,7 +179,7 @@ Servers that receive an extended hello containing a "ta_sa" extension MAY agree 
 ~~~~~~~
 {: #fig:srv-ext title="ta_sa extension, server"}
 
-In the case of the fixed(0) type, the cid_value contains the value to be used as 'cid'.  In the case of hotp(1), the window_size must be greater or equal to 1, and indicates the number of HOTP values that the server can recognize for this particular client.
+In case the fixed(0) type is chosen, 'cid_value' contains the value to be used as 'cid'.  In case hotp(1) type is chosen, 'window_size' must be greater or equal to 1, indicating the number of HOTP values that the server can recognize for this particular client.
 
 # Clashing HOTP CIDs
 {: #sec:clash }
