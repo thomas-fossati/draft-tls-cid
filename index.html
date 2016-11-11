@@ -375,8 +375,8 @@ li, p {
   </ul>
 
   <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a></h1>
-<p id="rfc.section.1.p.1">DTLS security context demultiplexing is done via the 5-tuple. Therefore, it needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after an short idle period.  In such situations, there is not enough information in the DTLS record header for a server that is handling multiple concurrent sessions to associate the new address to an existing client.</p>
-<p id="rfc.section.1.p.2">This memo proposes a new TLS extension <a href="#RFC6066">[RFC6066]</a> that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier &#8216;Connection ID (CID)&#8217;.  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different instances of the same transport, or even to a completely different transport as showed in <a href="#fig:transp-handover">Figure 1</a>.</p>
+<p id="rfc.section.1.p.1">DTLS security context demultiplexing is done via the 5-tuple. Therefore, the security association needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after a short idle period.  In such situations, there is not enough information in the DTLS record header for a server that is handling multiple concurrent sessions to associate the new address to an existing client.</p>
+<p id="rfc.section.1.p.2">This memo proposes a new TLS extension <a href="#RFC6066">[RFC6066]</a> that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier &#8216;Connection ID (CID)&#8217;.  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different instances of the same transport, or even to a completely different transport - e.g., from UDP to GSM-SMS as showed in <a href="#fig:transp-handover">Figure 1</a>.</p>
 <div id="rfc.figure.1"/>
 <div id="fig:transp-handover"/>
 <pre>
@@ -399,13 +399,13 @@ li, p {
                                      00
 </pre>
 <p class="figure">Figure 1: Transparent Handover of DTLS Session</p>
-<p id="rfc.section.1.p.3">We present two methods for producing the CID: the first uses a single value generated unilaterally by the server which is fixed throughout the session, whereas the second provides a sequence of identifiers that are created using a HMAC-based OTP algorithm <a href="#RFC4226">[RFC4226]</a> keyed with the session shared secret. The latter allows a client to shift to a new identifier, for example when switching networks, and is intended as a measure to counteract tracking.  However, it must be noted that this is not a generally viable way to avoid being tracked: in fact, it becomes totally ineffective when the client is oblivious of changes in the underlying transport identifiers (e.g., on NAT rebind after timeout), and also does not guarantee unique identifiers (see <a href="#sec:clash">Section 4</a>).  For both methods the generated CID is 32-bits in size, like the Security Parameter Index (SPI) in IPsec <a href="#RFC4301">[RFC4301]</a>.</p>
+<p id="rfc.section.1.p.3">We present two methods for producing the CID: the first uses a single value generated unilaterally by the server which is fixed throughout the session, whereas the second provides a sequence of identifiers that are created using a HMAC-based OTP algorithm <a href="#RFC4226">[RFC4226]</a> keyed with the session shared secret. The latter allows a client to shift to a new identifier, for example when switching networks, and is intended as a mechanism to counteract tracking.  However, it must be noted that this is not generally applicable as a tracking-protection measure: in fact, it becomes totally ineffective when the client is oblivious of changes in the underlying transport identifiers (e.g., on NAT rebind after timeout), and also does not guarantee unique identifiers (see <a href="#sec:clash">Section 4</a> for further details).  Both methods generate a CID that is 32-bits in size, like the Security Parameter Index (SPI) in IPsec <a href="#RFC4301">[RFC4301]</a>.</p>
 <p id="rfc.section.1.p.4">Similar approaches to support transparent handover of a DTLS session have been described in <a href="#I-D.barrett-mobile-dtls">[I-D.barrett-mobile-dtls]</a> and <a href="#DTLSMOB">[DTLSMOB]</a>.</p>
 <h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#conventions-used-in-this-document" id="conventions-used-in-this-document">Conventions used in this document</a></h1>
 <p id="rfc.section.2.p.1">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in <a href="#RFC2119">[RFC2119]</a>.</p>
 <h1 id="rfc.section.3"><a href="#rfc.section.3">3.</a> <a href="#transport-agnostic-security-associatiation-extension" id="transport-agnostic-security-associatiation-extension">Transport Agnostic Security Associatiation Extension</a></h1>
-<p id="rfc.section.3.p.1">In order to negotiate a Transport Agnostic Security Association, clients include an extension of type &#8220;ta_sa&#8221; in the (extended) client hello (<a href="#sec:ext-cli">Section 3.1</a>).  Servers that receive an extended hello containing a &#8220;ta_sa&#8221; extension MAY agree to use a Transport Agnostic Security Association by including an extension of type &#8220;ta_sa&#8221; in the extended server hello (<a href="#sec:srv-ext">Section 3.2</a>).</p>
-<p id="rfc.section.3.p.2">In both server and client agree, the DTLSCiphertext format does change after the DTLS connection state is updated; i.e., for the sending side, after the ChangeCipherSpec message is sent.  For the receiving sides, after the ChangeCipherSpec is received.</p>
+<p id="rfc.section.3.p.1">In order to negotiate a Transport Agnostic Security Association, clients include an extension of type &#8220;ta_sa&#8221; in the extended client hello (<a href="#sec:ext-cli">Section 3.1</a>).  Servers that receive an extended hello containing a &#8220;ta_sa&#8221; extension MAY agree to use a Transport Agnostic Security Association by including an extension of type &#8220;ta_sa&#8221; in the extended server hello (<a href="#sec:srv-ext">Section 3.2</a>).</p>
+<p id="rfc.section.3.p.2">If both server and client agree, the DTLSCiphertext format does change after the DTLS connection state is updated; i.e.: for the sending side, after the ChangeCipherSpec message is sent, for the receiving sides, after the ChangeCipherSpec is received.</p>
 <p id="rfc.section.3.p.3">The DTLSCiphertext format is changed for both the client and the server.  However, only a client can initiate a switch to an unused &#8216;cid&#8217; value; a server MUST utilize the same value seen on the last valid message received by the client.  A server which receives a &#8216;cid&#8217; value which is not expected (e.g., a value outside its advertised window) MAY ignore the packet.</p>
 <div id="rfc.figure.2"/>
 <div id="fig:record"/>
@@ -425,14 +425,14 @@ li, p {
 </pre>
 <p class="figure">Figure 2: Modified DTLS Record Format</p>
 <h1 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a> <a href="#sec:ext-cli" id="sec:ext-cli">Extended Client Hello</a></h1>
-<p id="rfc.section.3.1.p.1">In order to negotiate a Transport Agnostic Security Association, clients include an extension of type &#8220;ta_sa&#8221; in the (extended) client hello.  The &#8220;extension_data&#8221; field of this extension SHALL contain the ClientSecAssocData structure in <a href="#fig:cli-ext">Figure 3</a>.</p>
-<p id="rfc.section.3.1.p.2">In the case of the fixed(0) type, the cid of the packets after ChangeCipherSpec is sent explicitly by the server.</p>
-<p id="rfc.section.3.1.p.3">In the case of hotp(1) option the initial &#8216;cid&#8217; is calculated using the HOTP algorithm (<a href="#RFC4226">[RFC4226]</a>) as follows:</p>
+<p id="rfc.section.3.1.p.1">In order to negotiate a Transport Agnostic Security Association, clients include an extension of type &#8220;ta_sa&#8221; in the extended client hello.  The &#8220;extension_data&#8221; field of this extension SHALL contain the ClientSecAssocData structure in <a href="#fig:cli-ext">Figure 3</a>.</p>
+<p id="rfc.section.3.1.p.2">In case a fixed(0) type has been negotiated, the &#8216;cid&#8217; of the packets after ChangeCipherSpec is sent explicitly by the server.</p>
+<p id="rfc.section.3.1.p.3">In case a hotp(1) type has been negotiated, the initial &#8216;cid&#8217; is calculated using the HOTP algorithm (<a href="#RFC4226">[RFC4226]</a>) as follows:</p>
 <p/>
 
 <ul>
-  <li>A 20-byte string is generated <a href="#RFC5705">[RFC5705]</a> exporter.  The key material exporter uses the label &#8220;EXPORTER-ta-security- association-hotp&#8221; without the quotes, and without any context value.</li>
-  <li>The initial &#8216;cid&#8217; equals to the first HOTP value (i.e., the 31-bit value of Sbits in <a href="#RFC4226">[RFC4226]</a> notation), as generated by using the previously exported value as K.</li>
+  <li>A 20-byte string is generated using a <a href="#RFC5705">[RFC5705]</a> exporter.  The key material exporter uses the label &#8220;EXPORTER-ta-security-association-hotp&#8221; without the quotes, and without any context value.</li>
+  <li>The initial &#8216;cid&#8217; equals to the first HOTP value (i.e., the 31-bit value of Sbits in <a href="#RFC4226">[RFC4226]</a> notation), generated by using the previously exported value as K.</li>
 </ul>
 <p id="rfc.section.3.1.p.5">Subsequent values of the HOTP algorithm can be used in place of the initial, as long as they fall into the negotiated window_size (see <a href="#fig:srv-ext">Figure 4</a>).</p>
 <div id="rfc.figure.3"/>
@@ -448,7 +448,7 @@ li, p {
 </pre>
 <p class="figure">Figure 3: ta_sa extension, client</p>
 <h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#sec:srv-ext" id="sec:srv-ext">Extended Server Hello</a></h1>
-<p id="rfc.section.3.2.p.1">Servers that receive an extended hello containing a &#8220;ta_sa&#8221; extension MAY agree to use a Transport Agnostic Security Association by including an extension of type &#8220;ta_sa&#8221;, with &#8220;extension_data&#8221; being ServerSecAssocData, in the extended server hello (<a href="#fig:srv-ext">Figure 4</a>).</p>
+<p id="rfc.section.3.2.p.1">Servers that receive an extended hello containing a &#8220;ta_sa&#8221; extension MAY agree to use a Transport Agnostic Security Association by including an extension of type &#8220;ta_sa&#8221;, with &#8220;extension_data&#8221; being ServerSecAssocData in the extended server hello (<a href="#fig:srv-ext">Figure 4</a>).</p>
 <div id="rfc.figure.4"/>
 <div id="fig:srv-ext"/>
 <pre>
@@ -467,7 +467,7 @@ li, p {
          } ServerSecAssocData;
 </pre>
 <p class="figure">Figure 4: ta_sa extension, server</p>
-<p id="rfc.section.3.2.p.2">In the case of the fixed(0) type, the cid_value contains the value to be used as &#8216;cid&#8217;.  In the case of hotp(1), the window_size must be greater or equal to 1, and indicates the number of HOTP values that the server can recognize for this particular client.</p>
+<p id="rfc.section.3.2.p.2">In case the fixed(0) type is chosen, &#8216;cid_value&#8217; contains the value to be used as &#8216;cid&#8217;.  In case hotp(1) type is chosen, &#8216;window_size&#8217; must be greater or equal to 1, indicating the number of HOTP values that the server can recognize for this particular client.</p>
 <h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#sec:clash" id="sec:clash">Clashing HOTP CIDs</a></h1>
 <p id="rfc.section.4.p.1">Under the assumption that HOTP behaves like a PRF, the following table encodes the probability of a (32-bit) HOTP CID clash event in relation to the number of sessions a server might be concurrently handling.</p>
 <table cellpadding="3" cellspacing="0" class="tt full center">
