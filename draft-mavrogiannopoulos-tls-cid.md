@@ -181,9 +181,20 @@ Servers that receive an extended hello containing a "ta_sa" extension MAY agree 
 
 In case the fixed(0) type is chosen, 'cid_value' contains the value to be used as 'cid'.  In case hotp(1) type is chosen, 'window_size' must be greater or equal to 1, indicating the number of HOTP values that the server can recognize for this particular client.
 
+## Wire Format Changes
+{: #sec:new-wire-fmt }
+How to signal the modified wire format to the receiving end is currently an open problem.
+
+Note that moving the cid after the length field and computing the difference between the UDP datagram's and DTLS record's lengths is not an option because there is no guarantee that UDP datagrams carry one and one only DTLS record (Section 4.1.1. of {{RFC6347}}).
+
+Ideally, we would just bump the version number, but there seems to be limited room for maneuver given the way TLS encodes version information in the record header, and also given that we want CID to work with DTLS 1.2 and later.
+
+More discussion needed to sort out this point.
+
 # Clashing HOTP CIDs
 {: #sec:clash }
-Under the assumption that HOTP behaves like a PRF, the following table encodes the probability of a (32-bit) HOTP CID clash event in relation to the number of sessions a server might be concurrently handling.
+
+HOTP behaves like a PRF, thus uniformly distributing the produced CIDs across the 32-bit space.  {{tab:clash}} presents the probability to end up with two separate sessions having the same HOTP CID when the number of concurrent sessions is increased.
 
 | Sessions | Collision probability                        |
 |:---------|:---------------------------------------------|
@@ -193,8 +204,9 @@ Under the assumption that HOTP behaves like a PRF, the following table encodes t
 | 10000    |  0.011574031737, or about 1 in 86            |
 | 100000   |  0.687813095694, or about 1 in 1             |
 | 1000000  |  1.0, or about 1 in 1                        |
+{: #tab:clash }
 
-TODO
+The takeaway is that 32-bits are probably too few for highly loaded servers that want to do HOTP as their primary CID strategy.  An alternative would be for the server to stop negotiating 'hotp' and fall back to 'fixed' when the number of active sessions crosses some threshold; another would be to increase the CID space to 40 or 48 bits when HOTP is used.
 
 # Security Considerations
 
@@ -202,7 +214,7 @@ TODO
 
 # IANA Considerations
 
-This document defines a TLS extension: ts_sa(TODO).  This extension is assigned from the TLS ExtensionType registry defined in {{RFC5246}}.
+This document adds a new extension for DTLS: ts_sa(TODO).  This extension MUST only be used with DTLS, and not with TLS.  This extension is assigned from the TLS ExtensionType registry defined in {{RFC5246}}.
 
 # Acknowledgments
 
