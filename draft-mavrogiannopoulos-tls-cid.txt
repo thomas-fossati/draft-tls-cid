@@ -12,7 +12,7 @@ Expires: May 17, 2017                                                ARM
 
 
  Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic
-                 Security Association Extension for TLS
+                     Security Association Extension
                  draft-mavrogiannopoulos-tls-cid-latest
 
 Abstract
