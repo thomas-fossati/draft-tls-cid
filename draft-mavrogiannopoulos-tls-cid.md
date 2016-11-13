@@ -206,7 +206,7 @@ HOTP behaves like a PRF, thus uniformly distributing the produced CIDs across th
 | 1000000  |  1.0, or about 1 in 1                        |
 {: #tab:clash }
 
-The takeaway is that 32-bits are probably too few for highly loaded servers that want to do HOTP as their primary CID strategy.  An alternative would be for the server to stop negotiating 'hotp' and fall back to 'fixed' when the number of active sessions crosses some threshold; another would be to increase the CID space to 40 or 48 bits when HOTP is used.
+The takeaway is that 32-bits are probably too few for highly loaded servers that want to do HOTP as their primary CID allocation strategy.  An alternative would be for the server to stop negotiating 'hotp' and fall back to 'fixed' when the number of active sessions crosses some threshold; another would be to increase the CID space to 40 or 48 bits when HOTP is used.
 
 # Security Considerations
 
