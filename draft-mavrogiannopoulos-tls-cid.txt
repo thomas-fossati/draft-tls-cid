@@ -5,10 +5,10 @@
 TLS Working Group                                   N. Mavrogiannopoulos
 Internet-Draft                                                    RedHat
 Intended status: Standards Track                           H. Tschofenig
-Expires: May 15, 2017                                                ARM
+Expires: May 17, 2017                                                ARM
                                                               T. Fossati
                                                                    Nokia
-                                                       November 11, 2016
+                                                       November 13, 2016
 
 
  Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 15, 2017.
+   This Internet-Draft will expire on May 17, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 1]
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 1]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -72,13 +72,14 @@ Table of Contents
    3.  Transport Agnostic Security Associatiation Extension  . . . .   4
      3.1.  Extended Client Hello . . . . . . . . . . . . . . . . . .   4
      3.2.  Extended Server Hello . . . . . . . . . . . . . . . . . .   5
+     3.3.  Wire Format Changes . . . . . . . . . . . . . . . . . . .   6
    4.  Clashing HOTP CIDs  . . . . . . . . . . . . . . . . . . . . .   6
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   7
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .   8
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
 
 1.  Introduction
@@ -108,8 +109,7 @@ Table of Contents
 
 
 
-
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 2]
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 2]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -165,7 +165,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 3]
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 3]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -221,7 +221,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 4]
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 4]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -277,7 +277,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 5]
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 5]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -285,12 +285,29 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    must be greater or equal to 1, indicating the number of HOTP values
    that the server can recognize for this particular client.
 
+3.3.  Wire Format Changes
+
+   How to signal the modified wire format to the receiving end is
+   currently an open problem.
+
+   Note that moving the cid after the length field and computing the
+   difference between the UDP datagram's and DTLS record's lengths is
+   not an option because there is no guarantee that UDP datagrams carry
+   one and one only DTLS record (Section 4.1.1. of [RFC6347]).
+
+   Ideally, we would just bump the version number, but there seems to be
+   limited room for maneuver given the way TLS encodes version
+   information in the record header, and also given that we want CID to
+   work with DTLS 1.2 and later.
+
+   More discussion needed to sort out this point.
+
 4.  Clashing HOTP CIDs
 
-   Under the assumption that HOTP behaves like a PRF, the following
-   table encodes the probability of a (32-bit) HOTP CID clash event in
-   relation to the number of sessions a server might be concurrently
-   handling.
+   HOTP behaves like a PRF, thus uniformly distributing the produced
+   CIDs across the 32-bit space.  Table 1 presents the probability to
+   end up with two separate sessions having the same HOTP CID when the
+   number of concurrent sessions is increased.
 
         +----------+---------------------------------------------+
         | Sessions | Collision probability                       |
@@ -303,7 +320,23 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
         | 1000000  | 1.0, or about 1 in 1                        |
         +----------+---------------------------------------------+
 
-   TODO
+                                  Table 1
+
+   The takeaway is that 32-bits are probably too few for highly loaded
+   servers that want to do HOTP as their primary CID strategy.  An
+   alternative would be for the server to stop negotiating 'hotp' and
+   fall back to 'fixed' when the number of active sessions crosses some
+   threshold; another would be to increase the CID space to 40 or 48
+   bits when HOTP is used.
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 6]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
 5.  Security Considerations
 
@@ -311,8 +344,10 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 6.  IANA Considerations
 
-   This document defines a TLS extension: ts_sa(TODO).  This extension
-   is assigned from the TLS ExtensionType registry defined in [RFC5246].
+   This document adds a new extension for DTLS: ts_sa(TODO).  This
+   extension MUST only be used with DTLS, and not with TLS.  This
+   extension is assigned from the TLS ExtensionType registry defined in
+   [RFC5246].
 
 7.  Acknowledgments
 
@@ -326,17 +361,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    endorsement.
 
 8.  References
-
-
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 6]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
 
 8.1.  Normative References
 
@@ -359,6 +383,16 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               O. Ranen, "HOTP: An HMAC-Based One-Time Password
               Algorithm", RFC 4226, DOI 10.17487/RFC4226, December 2005,
               <http://www.rfc-editor.org/info/rfc4226>.
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 7]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246,
@@ -387,13 +421,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               Williams, M. and J. Barrett, "Mobile DTLS", draft-barrett-
               mobile-dtls-00 (work in progress), March 2009.
 
-
-
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 7]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
-
    [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
               Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
               December 2005, <http://www.rfc-editor.org/info/rfc4301>.
@@ -410,6 +437,17 @@ Authors' Addresses
    ARM
 
    EMail: hannes.tschofenig@arm.com
+
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 8]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
    Thomas Fossati
@@ -445,4 +483,22 @@ Authors' Addresses
 
 
 
-Mavrogiannopoulos, et al. Expires May 15, 2017                  [Page 8]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 9]
