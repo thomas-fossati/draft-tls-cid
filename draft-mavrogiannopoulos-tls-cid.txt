@@ -346,8 +346,8 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    respect to authentication, confidentiality and integrity.  On the
    other hand, since this identifier is not authenticated, it should not
    be used in any way that assumes it is, nor be assumed to be secret or
-   unknown to an adversary.  In general, the this identifier should not
-   be relied on more than the IP address or UDP port numbers are.
+   unknown to an adversary.  In general, this identifier should not be
+   relied on more than the IP address or UDP port numbers are.
 
    To address the privacy concerns of using a fixed identifier for the
    lifetime of a session which may roam through multiple networks, we
