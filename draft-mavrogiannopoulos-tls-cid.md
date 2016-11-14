@@ -212,9 +212,9 @@ The takeaway is that 32-bits are probably too few for highly loaded servers that
 
 This document introduces an identifier from a session between a client and a
 server. That identifier is intended to be used to identify the session when the transport layer
-over which TLS or DTLS are being used, does not offer such stable identifier.
+over which DTLS is being used, does not offer such stable identifier.
 It does not affect the running protocol in any way other than adding an
-additional, un-authenticated field. As such, this identifier has no effect on the
+un-authenticated field. As such, this identifier has no effect on the
 overall security of the session, with respect to authentication, confidentiality and integrity.
 
 On the other hand, since this identifier is not authenticated it should not
