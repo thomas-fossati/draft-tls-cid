@@ -210,25 +210,9 @@ The takeaway is that 32-bits are probably too few for highly loaded servers that
 
 # Security Considerations
 
-This document introduces an identifier from a session between a client and a
-server. That identifier is intended to be used to identify the session when the transport layer
-over which DTLS is being used, does not offer such stable identifier.
-It does not affect the running protocol in any way other than adding an
-un-authenticated field. As such, this identifier has no effect on the
-overall security of the session, with respect to authentication, confidentiality and integrity.
+CID does not affect the running protocol in any way other than adding an un-authenticated field to the record header. As such, this identifier has no effect on the overall security of the session with respect to authentication, confidentiality and integrity.  On the other hand, since this identifier is not authenticated, it should not be used in any way that assumes it is, nor be assumed to be secret or unknown to an adversary.  In general, the this identifier should not be relied on more than the IP address or UDP port numbers are.
 
-On the other hand, since this identifier is not authenticated it should not
-be used in any way that assumes that it is, nor be assumed to be secret
-or unknown to an adversary. The transport agnostic identifier should not be
-relied on, more than the TCP or UDP port numbers are.
-
-To address privacy concerns of using a fixed identifier for the lifetime of
-a session which may roam into multiple networks, we introduced the hotp
-identifier type, which could allow the client to switch identities when
-switching networks (assuming that client is made aware of the switch).
-The choice of which identifier to use, is a trade-off between the need for
-privacy and the ability of the server to firmly control the identifiers used,
-as explained in {{sec:clash}}.
+To address the privacy concerns of using a fixed identifier for the lifetime of a session which may roam through multiple networks, we have introduced the hotp identifier type.  This type of identifier gives the client a chance to switch its ts_sa identity when also switching its transport identifiers or network attachment (assuming that client is made aware of the change before it sends a new DTLS record).  The choice of which type of identifier to use is a trade-off between the request for privacy stated by the client and the ability of the server to control the identifiers in use at each point in time, as explained in {{sec:clash}}.
 
 # IANA Considerations
 
