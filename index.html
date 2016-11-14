@@ -289,7 +289,7 @@ li, p {
 
   <meta name="dct.creator" content="Mavrogiannopoulos, N., Tschofenig, H., and T. Fossati" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-mavrogiannopoulos-tls-cid-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2016-11-13" />
+  <meta name="dct.issued" scheme="ISO8601" content="2016-11-14" />
   <meta name="dct.abstract" content="This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different instances of the same transport, or to a completely different transport." />
   <meta name="description" content="This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different instances of the same transport, or to a completely different transport." />
 
@@ -313,7 +313,7 @@ li, p {
   <td class="right">H. Tschofenig</td>
 </tr>
 <tr>
-  <td class="left">Expires: May 17, 2017</td>
+  <td class="left">Expires: May 18, 2017</td>
   <td class="right">ARM</td>
 </tr>
 <tr>
@@ -326,7 +326,7 @@ li, p {
 </tr>
 <tr>
   <td class="left"></td>
-  <td class="right">November 13, 2016</td>
+  <td class="right">November 14, 2016</td>
 </tr>
 
     	
@@ -346,7 +346,7 @@ li, p {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on May 17, 2017.</p>
+<p>This Internet-Draft will expire on May 18, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -515,7 +515,9 @@ li, p {
 </table>
 <p id="rfc.section.4.p.2">The takeaway is that 32-bits are probably too few for highly loaded servers that want to do HOTP as their primary CID allocation strategy.  An alternative would be for the server to stop negotiating &#8216;hotp&#8217; and fall back to &#8216;fixed&#8217; when the number of active sessions crosses some threshold; another would be to increase the CID space to 40 or 48 bits when HOTP is used.</p>
 <h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a></h1>
-<p id="rfc.section.5.p.1">TODO</p>
+<p id="rfc.section.5.p.1">This document introduces an identifier from a session between a client and a server. That identifier is intended to be used to identify the session when the transport layer over which DTLS is being used, does not offer such stable identifier.  It does not affect the running protocol in any way other than adding an un-authenticated field. As such, this identifier has no effect on the overall security of the session, with respect to authentication, confidentiality and integrity.</p>
+<p id="rfc.section.5.p.2">On the other hand, since this identifier is not authenticated it should not be used in any way that assumes that it is, nor be assumed to be secret or unknown to an adversary. The transport agnostic identifier should not be relied on, more than the TCP or UDP port numbers are.</p>
+<p id="rfc.section.5.p.3">To address privacy concerns of using a fixed identifier for the lifetime of a session which may roam into multiple networks, we introduced the hotp identifier type, which could allow the client to switch identities when switching networks (assuming that client is made aware of the switch).  The choice of which identifier to use, is a trade-off between the need for privacy and the ability of the server to firmly control the identifiers used, as explained in <a href="#sec:clash">Section 4</a>.</p>
 <h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a></h1>
 <p id="rfc.section.6.p.1">This document adds a new extension for DTLS: ts_sa(TODO).  This extension MUST only be used with DTLS, and not with TLS.  This extension is assigned from the TLS ExtensionType registry defined in <a href="#RFC5246">[RFC5246]</a>.</p>
 <h1 id="rfc.section.7"><a href="#rfc.section.7">7.</a> <a href="#acknowledgments" id="acknowledgments">Acknowledgments</a></h1>

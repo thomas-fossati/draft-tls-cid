@@ -5,10 +5,10 @@
 TLS Working Group                                   N. Mavrogiannopoulos
 Internet-Draft                                                    RedHat
 Intended status: Standards Track                           H. Tschofenig
-Expires: May 17, 2017                                                ARM
+Expires: May 18, 2017                                                ARM
                                                               T. Fossati
                                                                    Nokia
-                                                       November 13, 2016
+                                                       November 14, 2016
 
 
  Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 17, 2017.
+   This Internet-Draft will expire on May 18, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 1]
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 1]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -77,10 +77,10 @@ Table of Contents
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
    7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   7
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
      8.2.  Informative References  . . . . . . . . . . . . . . . . .   8
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   9
 
 1.  Introduction
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 2]
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 2]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -165,7 +165,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 3]
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 3]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -221,7 +221,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 4]
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 4]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -277,7 +277,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 5]
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 5]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -333,14 +333,36 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 6]
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 6]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 5.  Security Considerations
 
-   TODO
+   This document introduces an identifier from a session between a
+   client and a server.  That identifier is intended to be used to
+   identify the session when the transport layer over which DTLS is
+   being used, does not offer such stable identifier.  It does not
+   affect the running protocol in any way other than adding an un-
+   authenticated field.  As such, this identifier has no effect on the
+   overall security of the session, with respect to authentication,
+   confidentiality and integrity.
+
+   On the other hand, since this identifier is not authenticated it
+   should not be used in any way that assumes that it is, nor be assumed
+   to be secret or unknown to an adversary.  The transport agnostic
+   identifier should not be relied on, more than the TCP or UDP port
+   numbers are.
+
+   To address privacy concerns of using a fixed identifier for the
+   lifetime of a session which may roam into multiple networks, we
+   introduced the hotp identifier type, which could allow the client to
+   switch identities when switching networks (assuming that client is
+   made aware of the switch).  The choice of which identifier to use, is
+   a trade-off between the need for privacy and the ability of the
+   server to firmly control the identifiers used, as explained in
+   Section 4.
 
 6.  IANA Considerations
 
@@ -359,6 +381,18 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    Horizon 2020 grant agreement no. 688421 Measurement and Architecture
    for a Middleboxed Internet (MAMI).  This support does not imply
    endorsement.
+
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 7]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
 8.  References
 
@@ -384,16 +418,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               Algorithm", RFC 4226, DOI 10.17487/RFC4226, December 2005,
               <http://www.rfc-editor.org/info/rfc4226>.
 
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 7]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
-
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246,
               DOI 10.17487/RFC5246, August 2008,
@@ -417,6 +441,15 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    [DTLSMOB]  Seggelmann, R., Tuexen, M., and E. Rathgeb, "DTLS
               Mobility", 2012.
 
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 8]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
+
    [I-D.barrett-mobile-dtls]
               Williams, M. and J. Barrett, "Mobile DTLS", draft-barrett-
               mobile-dtls-00 (work in progress), March 2009.
@@ -437,17 +470,6 @@ Authors' Addresses
    ARM
 
    EMail: hannes.tschofenig@arm.com
-
-
-
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 8]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
    Thomas Fossati
@@ -479,26 +501,4 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 17, 2017                  [Page 9]
+Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 9]
