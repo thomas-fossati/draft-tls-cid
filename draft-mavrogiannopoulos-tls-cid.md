@@ -210,7 +210,25 @@ The takeaway is that 32-bits are probably too few for highly loaded servers that
 
 # Security Considerations
 
-TODO
+This document introduces an identifier from a session between a client and a
+server. That identifier is intended to be used to identify the session when the transport layer
+over which TLS or DTLS are being used, does not offer such stable identifier.
+It does not affect the running protocol in any way other than adding an
+additional, un-authenticated field. As such, this identifier has no effect on the
+overall security of the session, with respect to authentication, confidentiality and integrity.
+
+On the other hand, since this identifier is not authenticated it should not
+be used in any way, that assumes that it is, nor be assumed to be secret
+or unknown to an adversary. The transport agnostic identifier should not be
+relied on, more than the TCP or UDP port numbers are.
+
+To address privacy concerns of using a fixed identifier for the lifetime of
+a session which may roam into multiple networks, we introduced the hotp
+identifier type, which could allow the client to switch identities when
+switching networks (assuming that client is  made aware of the switch).
+The choice of which identifier to use, is a trade-off between the need for
+privacy and the ability of the server to firmly control the identifiers used,
+as explained in {{sec:clash}}.
 
 # IANA Considerations
 
