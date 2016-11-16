@@ -221,7 +221,7 @@ This document adds a new extension for DTLS: ts_sa(TODO).  This extension MUST o
 # Acknowledgments
 
 Thanks to
-Achim Krauss,
+Achim Kraus,
 Carsten Bormann,
 Kai Hudalla,
 Simon Bernard,
