@@ -196,14 +196,14 @@ More discussion needed to sort out this point.
 
 HOTP behaves like a PRF, thus uniformly distributing the produced CIDs across the 32-bit space.  {{tab:clash}} presents the probability to end up with two separate sessions having the same HOTP CID when the number of concurrent sessions is increased.
 
-| Sessions | Collision probability                        |
-|:---------|:---------------------------------------------|
-| 10       |  1.16415320717e-08, or about 1 in 85,899,347 |
-| 100      |  1.16415254059e-06, or about 1 in 858,994    |
-| 1000     |  0.000116408545826, or about 1 in 8,590      |
-| 10000    |  0.011574031737, or about 1 in 86            |
-| 100000   |  0.687813095694, or about 1 in 1             |
-| 1000000  |  1.0, or about 1 in 1                        |
+| Sessions x window_size | Collision probability                        |
+|:---------------------- |:---------------------------------------------|
+| 10                     |  1.16415320717e-08, or about 1 in 85,899,347 |
+| 100                    |  1.16415254059e-06, or about 1 in 858,994    |
+| 1000                   |  0.000116408545826, or about 1 in 8,590      |
+| 10000                  |  0.011574031737, or about 1 in 86            |
+| 100000                 |  0.687813095694, or about 1 in 1             |
+| 1000000                |  1.0, or about 1 in 1                        |
 {: #tab:clash }
 
 The takeaway is that 32-bits are probably too few for highly loaded servers that want to do HOTP as their primary CID allocation strategy.  An alternative would be for the server to stop negotiating 'hotp' and fall back to 'fixed' when the number of active sessions crosses some threshold; another would be to increase the CID space to 40 or 48 bits when HOTP is used.
