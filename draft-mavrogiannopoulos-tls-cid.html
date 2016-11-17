@@ -289,7 +289,7 @@ li, p {
 
   <meta name="dct.creator" content="Mavrogiannopoulos, N., Tschofenig, H., and T. Fossati" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-mavrogiannopoulos-tls-cid-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2016-11-14" />
+  <meta name="dct.issued" scheme="ISO8601" content="2016-11-17" />
   <meta name="dct.abstract" content="This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different instances of the same transport, or to a completely different transport." />
   <meta name="description" content="This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different instances of the same transport, or to a completely different transport." />
 
@@ -313,7 +313,7 @@ li, p {
   <td class="right">H. Tschofenig</td>
 </tr>
 <tr>
-  <td class="left">Expires: May 18, 2017</td>
+  <td class="left">Expires: May 21, 2017</td>
   <td class="right">ARM</td>
 </tr>
 <tr>
@@ -326,7 +326,7 @@ li, p {
 </tr>
 <tr>
   <td class="left"></td>
-  <td class="right">November 14, 2016</td>
+  <td class="right">November 17, 2016</td>
 </tr>
 
     	
@@ -346,7 +346,7 @@ li, p {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on May 18, 2017.</p>
+<p>This Internet-Draft will expire on May 21, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -378,7 +378,7 @@ li, p {
 
   <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a></h1>
 <p id="rfc.section.1.p.1">DTLS security context demultiplexing is done via the 5-tuple. Therefore, the security association needs to be re-negotiated from scratch whenever the transport identifiers change. For example, when moving the network attachment from WLAN to a cellular connection, or when the IP address of the IoT devices changes during a sleep cycle. A NAT device may also modify the source UDP port after a short idle period.  In such cases, there is not enough information in the DTLS record header for a server that is handling multiple concurrent sessions to associate the new address to an existing client.</p>
-<p id="rfc.section.1.p.2">This memo proposes a new TLS extension <a href="#RFC6066">[RFC6066]</a> that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier Connection ID (CID).  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different instances of the same transport, or even to a completely different transport - e.g., from UDP to GSM-SMS as showed in <a href="#fig:transp-handover">Figure 1</a>.</p>
+<p id="rfc.section.1.p.2">This memo proposes a new TLS extension <a href="#RFC6066">[RFC6066]</a> for DTLS 1.2 and above that provides the ability to negotiate, at handshake time, a transport independent identifier that is unique per security association. We call this identifier Connection ID (CID).  Its function is to effectively decouple the DTLS session from the underlying transport protocol, allowing the same DTLS security association to be migrated across different instances of the same transport, or even to a completely different transport - e.g., from UDP to GSM-SMS as showed in <a href="#fig:transp-handover">Figure 1</a>.</p>
 <div id="rfc.figure.1"/>
 <div id="fig:transp-handover"/>
 <pre>
@@ -401,7 +401,7 @@ li, p {
                                      00
 </pre>
 <p class="figure">Figure 1: Transparent Handover of DTLS Session</p>
-<p id="rfc.section.1.p.3">We present two methods for producing the CID: the first uses a single value generated unilaterally by the server which is fixed throughout the session, whereas the second provides a sequence of identifiers that are created using a HMAC-based OTP algorithm <a href="#RFC4226">[RFC4226]</a> keyed with the session shared secret. The latter allows a client to shift to a new identifier, for example when switching networks, and is intended as a mechanism to counteract tracking.  However, it must be noted that this is not generally applicable as a tracking-protection measure: in fact, it becomes totally ineffective when the client is oblivious of changes in the underlying transport identifiers (e.g., on NAT rebind after timeout), and also does not guarantee unique identifiers (see <a href="#sec:clash">Section 4</a> for further details).  Both methods generate a CID that is 32-bits in size, like the Security Parameter Index (SPI) in IPsec <a href="#RFC4301">[RFC4301]</a>.</p>
+<p id="rfc.section.1.p.3">We present two methods for producing the CID: the first uses a single value generated unilaterally by the server which is fixed throughout the session, whereas the second provides a sequence of identifiers that are created using a HMAC-based OTP algorithm <a href="#RFC4226">[RFC4226]</a> keyed with a per-session shared secret (see <a href="#sec:ext-cli">Section 3.1</a> for details). The latter allows a client to shift to a new identifier, for example when switching networks, and is intended as a mechanism to counteract tracking by third party observers.  However, it must be noted that this is not generally applicable as a tracking-protection measure: in fact, it becomes totally ineffective when the client is oblivious of changes in the underlying transport identifiers (e.g., on NAT rebind after timeout), and also does not guarantee unique identifiers (see <a href="#sec:clash">Section 4</a> for further details).  Both methods generate a CID that is 32-bits in size, like the Security Parameter Index (SPI) in IPsec <a href="#RFC4301">[RFC4301]</a>.</p>
 <p id="rfc.section.1.p.4">Similar approaches to support transparent handover of a DTLS session have been described in <a href="#I-D.barrett-mobile-dtls">[I-D.barrett-mobile-dtls]</a> and <a href="#DTLSMOB">[DTLSMOB]</a>.</p>
 <h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#conventions-used-in-this-document" id="conventions-used-in-this-document">Conventions used in this document</a></h1>
 <p id="rfc.section.2.p.1">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in <a href="#RFC2119">[RFC2119]</a>.</p>
@@ -482,7 +482,7 @@ li, p {
 <table cellpadding="3" cellspacing="0" class="tt full center">
   <thead>
     <tr>
-      <th class="left">Sessions</th>
+      <th class="left">Sessions x window_size</th>
       <th class="left">Collision probability</th>
     </tr>
   </thead>
@@ -520,7 +520,7 @@ li, p {
 <h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a></h1>
 <p id="rfc.section.6.p.1">This document adds a new extension for DTLS: ts_sa(TODO).  This extension MUST only be used with DTLS, and not with TLS.  This extension is assigned from the TLS ExtensionType registry defined in <a href="#RFC5246">[RFC5246]</a>.</p>
 <h1 id="rfc.section.7"><a href="#rfc.section.7">7.</a> <a href="#acknowledgments" id="acknowledgments">Acknowledgments</a></h1>
-<p id="rfc.section.7.p.1">Thanks to Achim Krauss, Carsten Bormann, Kai Hudalla, Simon Bernard, Stephen Farrell, for helpful comments and discussions that have shaped the document.</p>
+<p id="rfc.section.7.p.1">Thanks to Achim Kraus, Carsten Bormann, Kai Hudalla, Simon Bernard, Stephen Farrell, for helpful comments and discussions that have shaped the document.</p>
 <p id="rfc.section.7.p.2">This work is partially supported by the European Commission under Horizon 2020 grant agreement no. 688421 Measurement and Architecture for a Middleboxed Internet (MAMI). This support does not imply endorsement.</p>
 <h1 id="rfc.references"><a href="#rfc.references">8.</a> References</h1>
 <h1 id="rfc.references.1"><a href="#rfc.references.1">8.1.</a> Normative References</h1>

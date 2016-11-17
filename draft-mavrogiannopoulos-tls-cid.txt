@@ -5,10 +5,10 @@
 TLS Working Group                                   N. Mavrogiannopoulos
 Internet-Draft                                                    RedHat
 Intended status: Standards Track                           H. Tschofenig
-Expires: May 18, 2017                                                ARM
+Expires: May 21, 2017                                                ARM
                                                               T. Fossati
                                                                    Nokia
-                                                       November 14, 2016
+                                                       November 17, 2016
 
 
  Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 18, 2017.
+   This Internet-Draft will expire on May 21, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 1]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 1]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -94,22 +94,22 @@ Table of Contents
    record header for a server that is handling multiple concurrent
    sessions to associate the new address to an existing client.
 
-   This memo proposes a new TLS extension [RFC6066] that provides the
-   ability to negotiate, at handshake time, a transport independent
-   identifier that is unique per security association.  We call this
-   identifier Connection ID (CID).  Its function is to effectively
-   decouple the DTLS session from the underlying transport protocol,
-   allowing the same DTLS security association to be migrated across
-   different instances of the same transport, or even to a completely
-   different transport - e.g., from UDP to GSM-SMS as showed in
-   Figure 1.
+   This memo proposes a new TLS extension [RFC6066] for DTLS 1.2 and
+   above that provides the ability to negotiate, at handshake time, a
+   transport independent identifier that is unique per security
+   association.  We call this identifier Connection ID (CID).  Its
+   function is to effectively decouple the DTLS session from the
+   underlying transport protocol, allowing the same DTLS security
+   association to be migrated across different instances of the same
+   transport, or even to a completely different transport - e.g., from
+   UDP to GSM-SMS as showed in Figure 1.
 
 
 
 
 
 
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 2]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 2]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -138,16 +138,17 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    value generated unilaterally by the server which is fixed throughout
    the session, whereas the second provides a sequence of identifiers
    that are created using a HMAC-based OTP algorithm [RFC4226] keyed
-   with the session shared secret.  The latter allows a client to shift
-   to a new identifier, for example when switching networks, and is
-   intended as a mechanism to counteract tracking.  However, it must be
-   noted that this is not generally applicable as a tracking-protection
-   measure: in fact, it becomes totally ineffective when the client is
-   oblivious of changes in the underlying transport identifiers (e.g.,
-   on NAT rebind after timeout), and also does not guarantee unique
-   identifiers (see Section 4 for further details).  Both methods
-   generate a CID that is 32-bits in size, like the Security Parameter
-   Index (SPI) in IPsec [RFC4301].
+   with a per-session shared secret (see Section 3.1 for details).  The
+   latter allows a client to shift to a new identifier, for example when
+   switching networks, and is intended as a mechanism to counteract
+   tracking by third party observers.  However, it must be noted that
+   this is not generally applicable as a tracking-protection measure: in
+   fact, it becomes totally ineffective when the client is oblivious of
+   changes in the underlying transport identifiers (e.g., on NAT rebind
+   after timeout), and also does not guarantee unique identifiers (see
+   Section 4 for further details).  Both methods generate a CID that is
+   32-bits in size, like the Security Parameter Index (SPI) in IPsec
+   [RFC4301].
 
    Similar approaches to support transparent handover of a DTLS session
    have been described in [I-D.barrett-mobile-dtls] and [DTLSMOB].
@@ -164,8 +165,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 3]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 3]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -221,7 +221,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 4]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 4]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -277,7 +277,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 5]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 5]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -309,16 +309,18 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    end up with two separate sessions having the same HOTP CID when the
    number of concurrent sessions is increased.
 
-        +----------+---------------------------------------------+
-        | Sessions | Collision probability                       |
-        +----------+---------------------------------------------+
-        | 10       | 1.16415320717e-08, or about 1 in 85,899,347 |
-        | 100      | 1.16415254059e-06, or about 1 in 858,994    |
-        | 1000     | 0.000116408545826, or about 1 in 8,590      |
-        | 10000    | 0.011574031737, or about 1 in 86            |
-        | 100000   | 0.687813095694, or about 1 in 1             |
-        | 1000000  | 1.0, or about 1 in 1                        |
-        +----------+---------------------------------------------+
+   +-----------------------+-------------------------------------------+
+   | Sessions x            | Collision probability                     |
+   | window_size           |                                           |
+   +-----------------------+-------------------------------------------+
+   | 10                    | 1.16415320717e-08, or about 1 in          |
+   |                       | 85,899,347                                |
+   | 100                   | 1.16415254059e-06, or about 1 in 858,994  |
+   | 1000                  | 0.000116408545826, or about 1 in 8,590    |
+   | 10000                 | 0.011574031737, or about 1 in 86          |
+   | 100000                | 0.687813095694, or about 1 in 1           |
+   | 1000000               | 1.0, or about 1 in 1                      |
+   +-----------------------+-------------------------------------------+
 
                                   Table 1
 
@@ -331,9 +333,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-
-
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 6]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 6]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -369,7 +369,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 7.  Acknowledgments
 
-   Thanks to Achim Krauss, Carsten Bormann, Kai Hudalla, Simon Bernard,
+   Thanks to Achim Kraus, Carsten Bormann, Kai Hudalla, Simon Bernard,
    Stephen Farrell, for helpful comments and discussions that have
    shaped the document.
 
@@ -389,7 +389,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 7]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 7]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -445,7 +445,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 8]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 8]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -501,4 +501,4 @@ Authors' Addresses
 
 
 
-Mavrogiannopoulos, et al. Expires May 18, 2017                  [Page 9]
+Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 9]
