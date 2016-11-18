@@ -5,10 +5,10 @@
 TLS Working Group                                   N. Mavrogiannopoulos
 Internet-Draft                                                    RedHat
 Intended status: Standards Track                           H. Tschofenig
-Expires: May 21, 2017                                                ARM
+Expires: May 22, 2017                                                ARM
                                                               T. Fossati
                                                                    Nokia
-                                                       November 17, 2016
+                                                       November 18, 2016
 
 
  Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic
@@ -18,12 +18,13 @@ Expires: May 21, 2017                                                ARM
 Abstract
 
    This memo proposes a new Datagram Transport Transport Layer Security
-   (DTLS) extension that provides the ability to negotiate, during
-   handshake, a transport independent identifier that is unique per
-   security association.  This identifier effectively decouples the DTLS
-   session from the underlying transport protocol, allowing the same
-   security association to be migrated across different instances of the
-   same transport, or to a completely different transport.
+   (DTLS) extension for DTLS 1.2 and above that provides the ability to
+   negotiate, during handshake, a transport independent identifier that
+   is unique per security association.  This identifier effectively
+   decouples the DTLS session from the underlying transport protocol,
+   allowing the same security association to be migrated across
+   different instances of the same transport, or to a completely
+   different transport.
 
 Status of This Memo
 
@@ -40,7 +41,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 21, 2017.
+   This Internet-Draft will expire on May 22, 2017.
 
 Copyright Notice
 
@@ -49,15 +50,15 @@ Copyright Notice
 
    This document is subject to BCP 78 and the IETF Trust's Legal
    Provisions Relating to IETF Documents
-   (http://trustee.ietf.org/license-info) in effect on the date of
 
 
 
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 1]
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 1]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
+   (http://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
    carefully, as they describe your rights and restrictions with respect
    to this document.  Code Components extracted from this document must
@@ -72,14 +73,15 @@ Table of Contents
    3.  Transport Agnostic Security Associatiation Extension  . . . .   4
      3.1.  Extended Client Hello . . . . . . . . . . . . . . . . . .   4
      3.2.  Extended Server Hello . . . . . . . . . . . . . . . . . .   5
-     3.3.  Wire Format Changes . . . . . . . . . . . . . . . . . . .   6
+     3.3.  Handling unknown CIDs . . . . . . . . . . . . . . . . . .   6
+     3.4.  Wire Format Changes . . . . . . . . . . . . . . . . . . .   6
    4.  Clashing HOTP CIDs  . . . . . . . . . . . . . . . . . . . . .   6
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   7
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .   8
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   8
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .   9
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   9
 
 1.  Introduction
@@ -107,9 +109,7 @@ Table of Contents
 
 
 
-
-
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 2]
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 2]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -165,7 +165,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 3]
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 3]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -187,9 +187,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    The DTLSCiphertext format is changed for both the client and the
    server.  However, only a client can initiate a switch to an unused
    'cid' value; a server MUST utilize the same value seen on the last
-   valid message received by the client.  A server which receives a
-   'cid' value which is not expected (e.g., a value outside its
-   advertised window) MAY ignore the packet.
+   valid message received by the client.
 
             struct {
                  ContentType type;
@@ -206,6 +204,9 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
                    Figure 2: Modified DTLS Record Format
 
+   See Section 3.3 for details on how to handle receipt of unknown or
+   unexpected CIDs.
+
 3.1.  Extended Client Hello
 
    In order to negotiate a Transport Agnostic Security Association,
@@ -216,15 +217,17 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    In case the fixed(0) type has been negotiated, the 'cid' of the
    packets after ChangeCipherSpec is sent explicitly by the server.
 
-   In case the hotp(1) type has been negotiated, the initial 'cid' is
-   calculated using the HOTP algorithm ([RFC4226]) as follows:
 
 
 
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 4]
+
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 4]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
+
+   In case the hotp(1) type has been negotiated, the initial 'cid' is
+   calculated using the HOTP algorithm ([RFC4226]) as follows:
 
    o  A 20-byte string is generated using a [RFC5705] exporter.  The key
       material exporter uses the label "EXPORTER-ta-security-
@@ -271,21 +274,39 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
                      Figure 4: ta_sa extension, server
 
-   In case the fixed(0) type is chosen, 'cid_value' contains the value
-   to be used as 'cid'.  In case hotp(1) type is chosen, 'window_size'
 
 
 
-
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 5]
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 5]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
+   In case the fixed(0) type is chosen, 'cid_value' contains the value
+   to be used as 'cid'.  In case hotp(1) type is chosen, 'window_size'
    must be greater or equal to 1, indicating the number of HOTP values
    that the server can recognize for this particular client.
 
-3.3.  Wire Format Changes
+3.3.  Handling unknown CIDs
+
+   Server might need to deal with unknown or unexpected CIDs.
+
+   An unknown CID is one that is not found in the lookup table.  This
+   could happen because:
+
+   o  Server reboots and looses its state; or
+   o  There is a genuine bug in either client or server code (or even
+      somewhere on the network path).
+
+   Either way, the server SHOULD return an error indication (TBD).  This
+   allows a client to re-establish the security context if needed, and
+   generally eases diagnostic and debug.
+
+   A CID might be unexpected if it existed but it's been already
+   shifted.  This situation may arise if the packet has been delayed or
+   replayed.  Server MAY ignore a record carrying an unexpected CID.
+
+3.4.  Wire Format Changes
 
    How to signal the modified wire format to the receiving end is
    currently an open problem.
@@ -307,7 +328,15 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    HOTP behaves like a PRF, thus uniformly distributing the produced
    CIDs across the 32-bit space.  Table 1 presents the probability to
    end up with two separate sessions having the same HOTP CID when the
-   number of concurrent sessions is increased.
+   number of concurrent sessions and/or the length of the CIDs sequence
+   is increased.
+
+
+
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 6]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
    +-----------------------+-------------------------------------------+
    | Sessions x            | Collision probability                     |
@@ -329,14 +358,8 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    strategy.  An alternative would be for the server to stop negotiating
    'hotp' and fall back to 'fixed' when the number of active sessions
    crosses some threshold; another would be to increase the CID space to
-   40 or 48 bits when HOTP is used.
-
-
-
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 6]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
+   40 or 48 bits when HOTP is used; yet another would be to allow the
+   length to be negotiable.
 
 5.  Security Considerations
 
@@ -359,6 +382,17 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    off between the request for privacy stated by the client and the
    ability of the server to control the identifiers in use at each point
    in time, as explained in Section 4.
+
+
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 7]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
 6.  IANA Considerations
 
@@ -387,13 +421,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               Version 1.3", draft-ietf-tls-tls13-18 (work in progress),
               October 2016.
 
-
-
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 7]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
-
    [I-D.rescorla-tls-dtls13]
               Rescorla, E. and H. Tschofenig, "The Datagram Transport
               Layer Security (DTLS) Protocol Version 1.3", draft-
@@ -413,6 +440,15 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               (TLS) Protocol Version 1.2", RFC 5246,
               DOI 10.17487/RFC5246, August 2008,
               <http://www.rfc-editor.org/info/rfc5246>.
+
+
+
+
+
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 8]
+
+Internet-Draft            DTLS ta_sa Extension             November 2016
+
 
    [RFC5705]  Rescorla, E., "Keying Material Exporters for Transport
               Layer Security (TLS)", RFC 5705, DOI 10.17487/RFC5705,
@@ -440,16 +476,6 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
               Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
               December 2005, <http://www.rfc-editor.org/info/rfc4301>.
 
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 8]
-
-Internet-Draft            DTLS ta_sa Extension             November 2016
-
-
 Authors' Addresses
 
    Nikos Mavrogiannopoulos
@@ -475,30 +501,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Mavrogiannopoulos, et al. Expires May 21, 2017                  [Page 9]
+Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 9]
