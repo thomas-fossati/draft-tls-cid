@@ -67,7 +67,7 @@ informative:
 
 --- abstract
 
-This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different instances of the same transport, or to a completely different transport.
+This memo proposes a new Datagram Transport Transport Layer Security (DTLS) extension for DTLS 1.2 and above that provides the ability to negotiate, during handshake, a transport independent identifier that is unique per security association. This identifier effectively decouples the DTLS session from the underlying transport protocol, allowing the same security association to be migrated across different instances of the same transport, or to a completely different transport.
 
 --- middle
 
@@ -112,8 +112,7 @@ In order to negotiate a Transport Agnostic Security Association, clients include
 
 If both server and client agree, the DTLSCiphertext format does change after the DTLS connection state is updated; i.e.: for the sending side, after the ChangeCipherSpec message is sent, for the receiving sides, after the ChangeCipherSpec is received.
 
-The DTLSCiphertext format is changed for both the client and the server.  However, only a client can initiate a switch to an unused 'cid' value; a server MUST utilize the same value seen on the last valid message received by the client.  A server which receives a 'cid' value which is not expected (e.g., a value outside its advertised window) MAY ignore the packet.
-
+The DTLSCiphertext format is changed for both the client and the server.  However, only a client can initiate a switch to an unused 'cid' value; a server MUST utilize the same value seen on the last valid message received by the client.
 
 ~~~~~~~
          struct {
@@ -131,6 +130,7 @@ The DTLSCiphertext format is changed for both the client and the server.  Howeve
 ~~~~~~~
 {: #fig:record title="Modified DTLS Record Format"}
 
+See {{sec:unknown-cid-handling}} for details on how to handle receipt of unknown or unexpected CIDs.
 
 ## Extended Client Hello
 {: #sec:ext-cli }
@@ -181,6 +181,20 @@ Servers that receive an extended hello containing a "ta_sa" extension MAY agree 
 
 In case the fixed(0) type is chosen, 'cid_value' contains the value to be used as 'cid'.  In case hotp(1) type is chosen, 'window_size' must be greater or equal to 1, indicating the number of HOTP values that the server can recognize for this particular client.
 
+## Handling unknown CIDs
+{: #sec:unknown-cid-handling }
+
+Server might need to deal with unknown or unexpected CIDs.
+
+An unknown CID is one that is not found in the lookup table.  This could happen because:
+
+- Server reboots and looses its state; or
+- There is a genuine bug in either client or server code (or even somewhere on the network path).
+
+Either way, the server SHOULD return an error indication (TBD).  This allows a client to re-establish the security context if needed, and generally eases diagnostic and debug.
+
+A CID might be unexpected if it existed but it's been already shifted.  This situation may arise if the packet has been delayed or replayed. Server MAY ignore a record carrying an unexpected CID.
+
 ## Wire Format Changes
 {: #sec:new-wire-fmt }
 How to signal the modified wire format to the receiving end is currently an open problem.
@@ -194,7 +208,7 @@ More discussion needed to sort out this point.
 # Clashing HOTP CIDs
 {: #sec:clash }
 
-HOTP behaves like a PRF, thus uniformly distributing the produced CIDs across the 32-bit space.  {{tab:clash}} presents the probability to end up with two separate sessions having the same HOTP CID when the number of concurrent sessions is increased.
+HOTP behaves like a PRF, thus uniformly distributing the produced CIDs across the 32-bit space.  {{tab:clash}} presents the probability to end up with two separate sessions having the same HOTP CID when the number of concurrent sessions and/or the length of the CIDs sequence is increased.
 
 | Sessions x window_size | Collision probability                        |
 |:---------------------- |:---------------------------------------------|
@@ -206,7 +220,7 @@ HOTP behaves like a PRF, thus uniformly distributing the produced CIDs across th
 | 1000000                |  1.0, or about 1 in 1                        |
 {: #tab:clash }
 
-The takeaway is that 32-bits are probably too few for highly loaded servers that want to do HOTP as their primary CID allocation strategy.  An alternative would be for the server to stop negotiating 'hotp' and fall back to 'fixed' when the number of active sessions crosses some threshold; another would be to increase the CID space to 40 or 48 bits when HOTP is used.
+The takeaway is that 32-bits are probably too few for highly loaded servers that want to do HOTP as their primary CID allocation strategy.  An alternative would be for the server to stop negotiating 'hotp' and fall back to 'fixed' when the number of active sessions crosses some threshold; another would be to increase the CID space to 40 or 48 bits when HOTP is used; yet another would be to allow the length to be negotiable.
 
 # Security Considerations
 
