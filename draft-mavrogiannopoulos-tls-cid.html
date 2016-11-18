@@ -482,7 +482,7 @@ li, p {
   <li>Server reboots and looses its state; or</li>
   <li>There is a genuine bug in either client or server code (or even somewhere on the network path).</li>
 </ul>
-<p id="rfc.section.3.3.p.4">Either way, the server SHOULD return an error indication (TBD).  This allows a client to re-establish the security context if needed, and generally eases diagnostic and debug.</p>
+<p id="rfc.section.3.3.p.4">Either way, the server will not be able to locate a suitable context to use for sending an Alert back to the sender, and have to silently drop the record.</p>
 <p id="rfc.section.3.3.p.5">A CID might be unexpected if it existed but it&#8217;s been already shifted.  This situation may arise if the packet has been delayed or replayed. Server MAY ignore a record carrying an unexpected CID.</p>
 <h1 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a> <a href="#sec:new-wire-fmt" id="sec:new-wire-fmt">Wire Format Changes</a></h1>
 <p id="rfc.section.3.4.p.1">How to signal the modified wire format to the receiving end is currently an open problem.</p>
