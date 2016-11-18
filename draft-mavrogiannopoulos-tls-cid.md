@@ -186,7 +186,7 @@ In case the fixed(0) type is chosen, 'cid_value' contains the value to be used a
 
 Server might need to deal with unknown or unexpected CIDs.
 
-An unknown CID is one that is not found in the lookup table.  This could happen because:
+An unknown CID is one that is not found in the server's lookup table.  This could happen because:
 
 - Server reboots and looses its state; or
 - There is a genuine bug in either client or server code (or even somewhere on the network path).
