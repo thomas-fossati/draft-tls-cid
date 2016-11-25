@@ -191,7 +191,7 @@ An unknown CID is one that is not found in the server's lookup table.  This coul
 - Server reboots and looses its state; or
 - There is a genuine bug in either client or server code (or even somewhere on the network path).
 
-Either way, the server will not be able to locate a suitable context to use for sending an Alert back to the sender, and have to silently drop the record.
+Either way, the server will not be able to locate a suitable context to use for sending an (encrypted) Alert back to the sender.  Therefore, the server should simply discard records containing an unknown CID.
 
 A CID might be unexpected if it existed but it's been already shifted.  This situation may arise if the packet has been delayed or replayed. Server MAY ignore a record carrying an unexpected CID.
 
