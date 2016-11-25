@@ -5,10 +5,10 @@
 TLS Working Group                                   N. Mavrogiannopoulos
 Internet-Draft                                                    RedHat
 Intended status: Standards Track                           H. Tschofenig
-Expires: May 22, 2017                                                ARM
+Expires: May 29, 2017                                                ARM
                                                               T. Fossati
                                                                    Nokia
-                                                       November 18, 2016
+                                                       November 25, 2016
 
 
  Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic
@@ -41,7 +41,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 22, 2017.
+   This Internet-Draft will expire on May 29, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 1]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 1]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 2]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 2]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -165,7 +165,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 3]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 3]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -221,7 +221,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 4]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 4]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -277,7 +277,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 5]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 5]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -299,8 +299,9 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
       somewhere on the network path).
 
    Either way, the server will not be able to locate a suitable context
-   to use for sending an Alert back to the sender, and have to silently
-   drop the record.
+   to use for sending an (encrypted) Alert back to the sender.
+   Therefore, the server should simply discard records containing an
+   unknown CID.
 
    A CID might be unexpected if it existed but it's been already
    shifted.  This situation may arise if the packet has been delayed or
@@ -328,15 +329,17 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
    HOTP behaves like a PRF, thus uniformly distributing the produced
    CIDs across the 32-bit space.  Table 1 presents the probability to
    end up with two separate sessions having the same HOTP CID when the
-   number of concurrent sessions and/or the length of the CIDs sequence
-   is increased.
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 6]
+
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 6]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
+
+   number of concurrent sessions and/or the length of the CIDs sequence
+   is increased.
 
    +-----------------------+-------------------------------------------+
    | Sessions x            | Collision probability                     |
@@ -386,10 +389,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-
-
-
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 7]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 7]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -445,7 +445,7 @@ Internet-Draft            DTLS ta_sa Extension             November 2016
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 8]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 8]
 
 Internet-Draft            DTLS ta_sa Extension             November 2016
 
@@ -501,4 +501,4 @@ Authors' Addresses
 
 
 
-Mavrogiannopoulos, et al. Expires May 22, 2017                  [Page 9]
+Mavrogiannopoulos, et al. Expires May 29, 2017                  [Page 9]
