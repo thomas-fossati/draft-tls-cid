@@ -107,6 +107,7 @@ Similar approaches to support transparent handover of a DTLS session have been d
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}.
 
 # Transport Agnostic Security Associatiation Extension
+{: #sec:new-record-fmt }
 
 In order to negotiate a Transport Agnostic Security Association, clients include an extension of type "ta_sa" in the extended client hello ({{sec:ext-cli}}).  Servers that receive an extended hello containing a "ta_sa" extension MAY agree to use a Transport Agnostic Security Association by including an extension of type "ta_sa" in the extended server hello ({{sec:srv-ext}}).
 
@@ -206,6 +207,12 @@ Note that moving the cid after the length field and computing the difference bet
 Ideally, we would just bump the version number, but there seems to be limited room for maneuver given the way TLS encodes version information in the record header, and also given that we want CID to work with DTLS 1.2 and later.
 
 More discussion needed to sort out this point.
+
+## De-duplication Algorithm
+
+The following algorithm assumes that receivers have an unambiguous way to tell that the wire format is the one described in {{sec:new-record-fmt}}.  As suggested in {{sec:new-wire-fmt}}, this could be signalled by a different version number { TBD, TBD }.
+
+In order to enqueue an incoming record to the right security context, a receiver SHALL extract the 4-tuple from the UDP packet and the ContentType of the TLS record.  Then, if ContentType is change_cipher_spec or handshake, the receiver SHALL use the sender address to lookup or create (if ContentType is handshake and HandshakeType is one of ClientHello or ServerHello) the session context.  If ContentType is one of application_data or alert, receiver SHALL inspect the ProtocolVersion field and: if it is { 3, 3 } (i.e., TLS v1.2), use the 4-tuple to lookup the session context, if it is { TBD, TBD }, extract the CID from the record and use it to lookup the session context.
 
 # Clashing HOTP CIDs
 {: #sec:clash }
