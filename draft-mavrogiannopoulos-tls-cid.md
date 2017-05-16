@@ -1,7 +1,7 @@
 ---
 title: Datagram Transport Transport Layer Security (DTLS) Transport-Agnostic Security Association Extension
 abbrev: DTLS ta_sa Extension
-docname: draft-mavrogiannopoulos-tls-cid-latest
+docname: draft-mavrogiannopoulos-tls-cid-01
 category: std
 
 ipr: trust200902
